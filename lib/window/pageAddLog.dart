@@ -91,46 +91,16 @@ class _AddTransactionState extends State<AddTransaction> {
                   border: OutlineInputBorder(),
                 ),
                 items: [
-                  DropdownMenuItem(
-                    value: 'Null',
-                    child: Text('Select Category'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Food',
-                    child: Text('Food'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Travel expenses',
-                    child: Text('Travel expenses'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Water bill',
-                    child: Text('Water bill'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Electricity bill',
-                    child: Text('Electricity bill'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'House cost',
-                    child: Text('House cost'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Car fare',
-                    child: Text('Car fare'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Gasoline cost',
-                    child: Text('Gasoline cost'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Cost of equipment',
-                    child: Text('Cost of equipment'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Other',
-                    child: Text('Other'),
-                  ),
+                  DropdownMenuItem(value: 'Null', child: Text('Please Select'),),
+                  DropdownMenuItem(value: 'Food', child: Text('Food'),),
+                  DropdownMenuItem(value: 'Travel expenses', child: Text('Travel expenses'),),
+                  DropdownMenuItem(value: 'Water bill', child: Text('Water bill'),),
+                  DropdownMenuItem(value: 'Electricity bill', child: Text('Electricity bill'),),
+                  DropdownMenuItem(value: 'House cost', child: Text('House cost'),),
+                  DropdownMenuItem(value: 'Car fare', child: Text('Car fare'),),
+                  DropdownMenuItem(value: 'Gasoline cost', child: Text('Gasoline cost'),),
+                  DropdownMenuItem(value: 'Cost of equipment', child: Text('Cost of equipment'),),
+                  DropdownMenuItem(value: 'Other', child: Text('Other'),),
                 ],
                 validator: FormBuilderValidators.required(
                   errorText: 'Please select a category',
@@ -142,7 +112,6 @@ class _AddTransactionState extends State<AddTransaction> {
                 controller: _amountController,
                 decoration: InputDecoration(
                   labelText: 'Enter Amount of Money',
-                  border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -155,7 +124,6 @@ class _AddTransactionState extends State<AddTransaction> {
                   return null;
                 },
               ),
-              SizedBox(height: 10), // เพิ่มระยะห่างระหว่าง fields
 
               FormBuilderTextField(
                 name: 'memoController',
@@ -166,7 +134,6 @@ class _AddTransactionState extends State<AddTransaction> {
                 ),
                 maxLines: 3,
               ),
-              SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.saveAndValidate()) {

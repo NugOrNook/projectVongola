@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'window/page1.dart';
+import 'window/Page1/page1.dart';
 import 'window/page2.dart';
 import 'window/page3.dart';
 import 'window/page4.dart';
@@ -10,7 +10,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DatabaseManagement.instance.database;  // Initialize the database
-  await DatabaseManagement.instance.showAllData();  // Call the function to show data
+  /*await DatabaseManagement.instance.showAllData();  // Call the function to show data*/
   await initializeDateFormatting('th', null);  // Initialize ข้อมูล locale สำหรับภาษาไทย
 
   runApp(MyApp());  // เริ่มแอปพลิเคชัน
