@@ -20,7 +20,7 @@ class DatabaseManagement {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();                          
     final path = join(dbPath, filePath);      
-    await deleteDatabase(path); // ลบฐานข้อมูลหากมีอยู่แล้ว                        
+    //await deleteDatabase(path); // ลบฐานข้อมูลหากมีอยู่แล้ว                        
     return await openDatabase(path, version: 1, onCreate: _createDB); 
   }
 
@@ -164,40 +164,40 @@ class DatabaseManagement {
   }
 
   // ---------------------------{ delete ตาราง }----------------------------
-  Future<int> deleteAllTransactions() async {
-    final db = await instance.database;
-    return await db.delete('transactions');
-  }
-
-  Future close() async {
-    final db = await instance.database;
-    db.close();
-  }
-  // ------------------------------------------------------
-  // Future<void> showAllData() async {
-  //   Database db = await instance.database;
-
-  //   // ดึงข้อมูลจากตาราง transaction
-  //   List<Map<String, dynamic>> transactions = await db.query(tableTransaction);
-  //   print('Transactions:');
-  //   transactions.forEach((transaction) {
-  //     print(transaction);
-  //   });
-
-  //   // ดึงข้อมูลจากตาราง budget
-  //   List<Map<String, dynamic>> budgets = await db.query(tableBudget);
-  //   print('Budgets:');
-  //   budgets.forEach((budget) {
-  //     print(budget);
-  //   });
-
-  //   // ดึงข้อมูลจากตาราง type_transaction
-  //   List<Map<String, dynamic>> typeTransactions = await db.query(tableTypeTransaction);
-  //   print('Type Transactions:');
-  //   typeTransactions.forEach((typeTransaction) {
-  //     print(typeTransaction);
-  //   });
+  // Future<int> deleteAllTransactions() async {
+  //   final db = await instance.database;
+  //   return await db.delete('transactions');
   // }
+
+  // Future close() async {
+  //   final db = await instance.database;
+  //   db.close();
+  // }
+  // ------------------------------------------------------
+  Future<void> showAllData() async {
+    Database db = await instance.database;
+
+    // ดึงข้อมูลจากตาราง transaction
+    List<Map<String, dynamic>> transactions = await db.query(tableTransaction);
+    print('Transactions:');
+    transactions.forEach((transaction) {
+      print(transaction);
+    });
+
+    // ดึงข้อมูลจากตาราง budget
+    List<Map<String, dynamic>> budgets = await db.query(tableBudget);
+    print('Budgets:');
+    budgets.forEach((budget) {
+      print(budget);
+    });
+
+    // ดึงข้อมูลจากตาราง type_transaction
+    List<Map<String, dynamic>> typeTransactions = await db.query(tableTypeTransaction);
+    print('Type Transactions:');
+    typeTransactions.forEach((typeTransaction) {
+      print(typeTransaction);
+    });
+  }
 
   Future<int?> getTypeTransactionId(String category) async {
     Database db = await DatabaseManagement.instance.database;

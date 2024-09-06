@@ -70,16 +70,22 @@ class _Introduction extends State<Page1> {
           ),
         ),
 
+        Expanded(
+          child: CardFinancial(
+            transactionsFuture: _transactionsFuture,
+         ), // ส่ง Future ให้กับ CardFinancial
+        ),
+
         // Card 
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 20.0), // ระยะห่างบนและล่างของ Card
-              child: CardFinancial(transactionsFuture: _transactionsFuture),
-            )
-          ]
-        ), 
+        // Column(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: [
+        //     Container(
+        //       padding: EdgeInsets.symmetric(vertical: 20.0), // ระยะห่างบนและล่างของ Card
+        //       child: CardFinancial(transactionsFuture: _transactionsFuture),
+        //     )
+        //   ]
+        // ), 
       ],
     ),
 
