@@ -70,6 +70,17 @@ flutter:
     - assets/wallet_gray.png
     - assets/budget_color.png
     - assets/budget_gray.png
+
+    - assets/food.png
+    - assets/travel_expenses.png
+    - assets/water_bill.png
+    - assets/electricity_bill.png
+    - assets/house.png
+    - assets/car.png
+    - assets/gasoline_cost.png
+    - assets/personal.png
+    - assets/Other.png
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

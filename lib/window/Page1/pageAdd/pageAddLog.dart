@@ -19,7 +19,6 @@ class _AddTransactionState extends State<AddTransaction> {
   final _formKey = GlobalKey<FormBuilderState>();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _memoController = TextEditingController();
-  final TextEditingController _dateTimeController = TextEditingController();
   final ImageOcrHelper _imageOcrHelper = ImageOcrHelper();  // สร้างอินสแตนซ์ของ ImageOcrHelper พอย
 
   @override
@@ -122,7 +121,6 @@ class _AddTransactionState extends State<AddTransaction> {
               ),
               FormBuilderDateTimePicker(
                 name: 'dateTimeController',
-                controller: _dateTimeController,
                 initialValue: DateTime.now(),
                 firstDate: DateTime(2000),
                 lastDate: DateTime(2100),

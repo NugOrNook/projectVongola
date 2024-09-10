@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../pageAddLog.dart';
+import 'pageAdd/pageAddLog.dart';
 import '../../database/db_manage.dart';
 import 'CardDashBoard.dart';
 import 'CardFinancial.dart';
@@ -30,23 +30,27 @@ class _Introduction extends State<Page1> {
       children: <Widget>[
         // Text Introduction
         Container(
-          padding: EdgeInsets.fromLTRB(45, 80, 15, 0), // จัดตำแหน่ง ซ้าย บน ขวา ล่าง
+          padding: EdgeInsets.fromLTRB(20, 80, 15, 0), // จัดตำแหน่ง ซ้าย บน ขวา ล่าง
           child: Text(
             'Hello, Friend!',
             style: TextStyle(
-              fontSize: 30,
+              fontSize: 26,
               color: Colors.black,  
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
         Container(
-          padding: EdgeInsets.fromLTRB(45, 0, 15, 5),
+          padding: EdgeInsets.only(
+            top: 0,   // ระยะห่างด้านบน
+            bottom: 0, // ระยะห่างด้านล่าง
+            left: 20
+          ),
           child: Text(
             "Let's start accounting for expenses",
             style: TextStyle(
-              fontSize: 16,
-              color: const Color.fromARGB(255, 85, 85, 85),
+              fontSize: 14,
+              color: const Color.fromARGB(255, 121, 121, 121),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -54,17 +58,20 @@ class _Introduction extends State<Page1> {
 
         // Card DashBoard
         Padding(
-          padding: EdgeInsets.symmetric(vertical: 20.0), // ระยะห่างบนและล่างของ Card
+          padding: EdgeInsets.only(
+            top: 20,   // ระยะห่างด้านบน
+            bottom: 20, // ระยะห่างด้านล่าง
+          ),
           child: CardDashBoard(),
         ),
 
         // "Budget in each category"
         Container(
-          padding: EdgeInsets.fromLTRB(45, 20, 15, 5),
+          padding: EdgeInsets.fromLTRB(20, 20, 15, 0),
           child: Text(
             "Budget in each category",
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 18,
               color: Colors.black,
             ),
           ),
@@ -73,7 +80,7 @@ class _Introduction extends State<Page1> {
         Expanded(
           child: CardFinancial(
             transactionsFuture: _transactionsFuture,
-         ), // ส่ง Future ให้กับ CardFinancial
+          ), // ส่ง Future ให้กับ CardFinancial
         ),
 
         // Card 
@@ -98,7 +105,7 @@ class _Introduction extends State<Page1> {
         );
         _refreshTransactions(); // รีเฟรชข้อมูลเมื่อกลับมาจากหน้า AddTransaction
       },
-      child: const Icon(Icons.add),
+      child: const Icon(Icons.add, size: 25,),
     ),
   );
 }
