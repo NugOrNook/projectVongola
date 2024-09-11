@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import '../../../imageOCR/pick_picture.dart';
-import '../../../database/db_manage.dart';
+import '../../imageOCR/pick_picture.dart';
+import '../../database/db_manage.dart';
 import 'package:flutter/services.dart';
 
 class AddTransaction extends StatefulWidget {
@@ -19,6 +19,7 @@ class _AddTransactionState extends State<AddTransaction> {
   final _formKey = GlobalKey<FormBuilderState>();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _memoController = TextEditingController();
+  final TextEditingController _dateTimeController = TextEditingController();
   final ImageOcrHelper _imageOcrHelper = ImageOcrHelper();  // สร้างอินสแตนซ์ของ ImageOcrHelper พอย
 
   @override
@@ -147,7 +148,8 @@ class _AddTransactionState extends State<AddTransaction> {
                   DropdownMenuItem(value: 'House cost', child: Text('House cost'),),
                   DropdownMenuItem(value: 'Car fare', child: Text('Car fare'),),
                   DropdownMenuItem(value: 'Gasoline cost', child: Text('Gasoline cost'),),
-                  DropdownMenuItem(value: 'Cost of equipment', child: Text('Cost of equipment'),),
+                  DropdownMenuItem(value: 'Medical expenses', child: Text('Medical expenses'),),
+                  DropdownMenuItem(value: 'Beauty expenses', child: Text('Beauty expenses'),),
                   DropdownMenuItem(value: 'Other', child: Text('Other'),),
                 ],
                 validator: FormBuilderValidators.required(
@@ -200,7 +202,7 @@ class _AddTransactionState extends State<AddTransaction> {
                 onPressed: () async {
                   if (_formKey.currentState!.saveAndValidate()) {
                     var typeExpense = _formKey.currentState?.value['transactionType'];
-                    var date = _formKey.currentState?.value['date'];
+                    var date = _formKey.currentState?.value['dateTimeController'];
                     var category = _formKey.currentState?.value['category'];
                     var amount = _amountController.text;
                     var memo = _memoController.text;

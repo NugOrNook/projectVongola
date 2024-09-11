@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pageAdd/pageAddLog.dart';
+import 'pageAddLog.dart';
 import '../../database/db_manage.dart';
 import 'CardDashBoard.dart';
 import 'CardFinancial.dart';

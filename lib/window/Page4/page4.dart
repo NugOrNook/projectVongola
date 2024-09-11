@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'budgetCatagory.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class Page4 extends StatefulWidget {
   @override
@@ -28,16 +29,37 @@ class CreateBudget extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildCategoryItem('assets/house.png', "House cost"),
-              _buildCategoryItem('assets/car.png', "Car fare"),
-              _buildCategoryItem('assets/water_bill.png', "Water bill"),
-              _buildAddButton(context),
+              Flexible(
+                child: CarouselSlider(
+                  options: CarouselOptions(
+                    height: 120, // ความสูงของ Carousel
+                    viewportFraction: 0.338, // ระยะห่างของแต่ละ item เทียบกับหน้าจอ
+                    enableInfiniteScroll: false, // ปิดการ scroll แบบวน
+                    // enlargeCenterPage: false, // ไม่ขยาย item ตรงกลาง
+                    padEnds: false, // ปิดการ pad ขอบทั้งสองข้าง
+                  ),
+                  items: [
+                    _buildCategoryItem('assets/food.png', "Food", 'Food'),
+                    _buildCategoryItem('assets/travel_expenses.png', "Travel", 'Travel expenses'),
+                    _buildCategoryItem('assets/water_bill.png', "Water", 'Water bill'),
+                    _buildCategoryItem('assets/electricity_bill.png', "Electricity", 'Electricity bill'),
+                    _buildCategoryItem('assets/house.png', "House", 'House cost'),
+                    _buildCategoryItem('assets/car.png', "Car", 'Car fare'),
+                    _buildCategoryItem('assets/gasoline_cost.png', "Gasoline", 'Gasoline cost'),
+                    _buildCategoryItem('assets/medical.png', "Medical", 'Medical expenses'),
+                    _buildCategoryItem('assets/beauty.png', "Beauty", 'Beauty expenses'),
+                    _buildCategoryItem('assets/Other.png', "Other", 'Other'),
+                  ],
+                ),
+              ),
+              
+              _buildAddButton(context), // ปุ่ม add ยังอยู่ในตำแหน่งเดิม
             ],
           ),
         ),
         Container(
           alignment: Alignment.centerLeft,
-          padding: EdgeInsets.only(top: 20, left: 20, bottom: 20), // กำหนดเฉพาะด้านบน
+          padding: EdgeInsets.only(top: 0, left: 20, bottom: 20),
           child: Text(
             "Budget in each category",
             style: TextStyle(
@@ -50,9 +72,9 @@ class CreateBudget extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.only(bottom: 16, left: 20, right: 20),
             children: [
-              _buildBudgetItem('assets/food.png', "Food", 2000, 1250),
+              _buildBudgetItem('assets/food.png', "Food", 2000, 1850),
               _buildBudgetItem('assets/car.png', "Car fare", 1500, 950),
-              _buildBudgetItem('assets/personal.png', "Personal Item", 2000, 1200),
+              _buildBudgetItem('assets/beauty.png', "Beauty", 2000, 100),
             ],
           ),
         ),
@@ -60,21 +82,21 @@ class CreateBudget extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryItem(String imagePath, String label) {
+  Widget _buildCategoryItem(String imagePath, String label, String valued) {
     return Column(
       children: [
         Container(
           height: 95,
           width: 75,
-          margin: EdgeInsets.all(8), // ระยะห่างจากกรอบรอบนอก
-          padding: EdgeInsets.symmetric(vertical: 16), // ระยะห่างจากขอบกล่องในแนวตั้ง
+          margin: EdgeInsets.all(8),
+          padding: EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 255, 255, 255), // พื้นหลังสีเทาอ่อน
+            color: const Color.fromARGB(255, 255, 255, 255),
             border: Border.all(
-              color: const Color.fromARGB(255, 217, 217, 217), // ขอบสีเทาเข้มเล็กน้อย
-              width: 1, // ความกว้างของขอบ
+              color: const Color.fromARGB(255, 217, 217, 217),
+              width: 1,
             ),
-            borderRadius: BorderRadius.circular(8), // ขอบมนของกล่อง
+            borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.3),
@@ -88,19 +110,19 @@ class CreateBudget extends StatelessWidget {
             children: [
               Image.asset(
                 imagePath,
-                width: 35, // กำหนดขนาดของรูปภาพ
+                width: 35,
                 height: 35,
               ),
-              SizedBox(height: 9), // ระยะห่างระหว่างรูปภาพและข้อความ
+              SizedBox(height: 9),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 12, // ขนาดของตัวอักษร
+                  fontSize: 12,
                 ),
-                textAlign: TextAlign.center, // จัดข้อความให้อยู่ตรงกลาง
-                softWrap: true, // อนุญาตให้ตัดคำอัตโนมัติ
-                maxLines: 2, // จำกัดจำนวนบรรทัดสูงสุดเป็น 2 บรรทัด
-                overflow: TextOverflow.ellipsis, // ถ้าข้อความยาวเกินจะใส่ "..." 
+                textAlign: TextAlign.center,
+                softWrap: true,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -116,11 +138,11 @@ class CreateBudget extends StatelessWidget {
           context,
           MaterialPageRoute(builder: (context) => Budgetcatagory()),
         );
-        // รีเฟรชข้อมูลเมื่อกลับมาจากหน้า Addbudgetcatagory
       },
       child: Column(
         children: [
           Container(
+            margin: EdgeInsets.only(left: 20),
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -148,8 +170,8 @@ class CreateBudget extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color.fromARGB(255, 217, 217, 217), // ขอบสีเทาเข้มเล็กน้อย
-          width: 1, // ความกว้างของขอบ
+          color: const Color.fromARGB(255, 217, 217, 217),
+          width: 1,
         ),
       ),
       child: Row(
@@ -185,7 +207,7 @@ class CreateBudget extends StatelessWidget {
                 LinearProgressIndicator(
                   value: progress,
                   backgroundColor: Colors.grey[300],
-                  color: progress > 0.5 ? Colors.blue : Colors.red,
+                  color: progress > 0.8 ? Colors.red : Colors.blue,
                 ),
               ],
             ),

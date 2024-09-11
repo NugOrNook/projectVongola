@@ -44,6 +44,7 @@ dependencies:
   form_builder_validators: ^11.0.0
   image_picker: ^1.1.2
   google_ml_kit: ^0.18.0
+  carousel_slider: ^5.0.0
 
 dev_dependencies:
   flutter_test:
@@ -78,7 +79,8 @@ flutter:
     - assets/house.png
     - assets/car.png
     - assets/gasoline_cost.png
-    - assets/personal.png
+    - assets/medical.png
+    - assets/beauty.png
     - assets/Other.png
 
   # The following line ensures that the Material Icons font is

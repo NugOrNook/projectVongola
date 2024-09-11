@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'addBudget.dart';
+import 'detailBudget.dart'; // เพิ่ม import สำหรับ detailBudget page
+import '../../database/db_manage.dart'; // เพิ่ม import สำหรับ DatabaseManagement
 
 class Budgetcatagory extends StatefulWidget {
   @override
@@ -8,15 +9,17 @@ class Budgetcatagory extends StatefulWidget {
 }
 
 class _Budgetcatagory extends State<Budgetcatagory> {
+  final DatabaseManagement _databaseManagement = DatabaseManagement.instance; // อินสแตนซ์ของ DatabaseManagement
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add budget catecory'),
+        title: Text('Add budget category'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // ปิดหน้า AddTransaction และย้อนกลับไปที่หน้าเดิม
+            Navigator.pop(context);
           },
         ),
       ),
@@ -26,15 +29,16 @@ class _Budgetcatagory extends State<Budgetcatagory> {
             child: ListView(
               padding: const EdgeInsets.only(bottom: 16, left: 20, right: 20, top: 20),
               children: [
-                _buildBudgetItem('assets/food.png', "Food", '0'),
-                _buildBudgetItem('assets/travel_expenses.png', "Travel expenses", '1'),
-                _buildBudgetItem('assets/personal.png', "Water bill", '2'),
-                _buildBudgetItem('assets/electricity_bill.png', "Electricity bill", '3'),
-                _buildBudgetItem('assets/house.png', "House cost", '4'),
-                _buildBudgetItem('assets/car.png', "Car fare", '5'),
-                _buildBudgetItem('assets/gasoline_cost.png', "Gasoline cost", '6'),
-                _buildBudgetItem('assets/personal.png', "Cost of equipment", '7'),
-                _buildBudgetItem('assets/Other.png', "Other",'8'),   
+                _buildBudgetItem('assets/food.png', "Food", 'Food'),
+                _buildBudgetItem('assets/travel_expenses.png', "Travel expenses", 'Travel expenses'),
+                _buildBudgetItem('assets/water_bill.png', "Water bill", 'Water bill'),
+                _buildBudgetItem('assets/electricity_bill.png', "Electricity bill", 'Electricity bill'),
+                _buildBudgetItem('assets/house.png', "House cost", 'House cost'),
+                _buildBudgetItem('assets/car.png', "Car fare", 'Car fare'),
+                _buildBudgetItem('assets/gasoline_cost.png', "Gasoline cost", 'Gasoline cost'),
+                _buildBudgetItem('assets/medical.png', "Medical", 'Medical expenses'),
+                _buildBudgetItem('assets/beauty.png', "Beauty", 'Beauty expenses'),
+                _buildBudgetItem('assets/Other.png', "Other", 'Other'),
               ],
             ),
           ),
@@ -45,14 +49,24 @@ class _Budgetcatagory extends State<Budgetcatagory> {
 
   Widget _buildBudgetItem(String imagePath, String label, String valued) {
     return GestureDetector(
-      onTap: () {
-        // เมื่อกดที่รายการ ให้เปิดหน้าใหม่พร้อมส่งค่า valued ไปด้วย
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AddBudget(valued: valued),
-          ),
-        );
+      onTap: () async {
+        // ตรวจสอบข้อมูลก่อนนำทาง
+        bool shouldNavigateToDetail = await _checkBudgetAvailability(valued);
+        if (shouldNavigateToDetail) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DetailBudget(valued: valued), // ไปที่หน้า detailBudget
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddBudget(valued: valued), // ไปที่หน้า AddBudget
+            ),
+          );
+        }
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
@@ -61,8 +75,8 @@ class _Budgetcatagory extends State<Budgetcatagory> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: const Color.fromARGB(255, 217, 217, 217), // ขอบสีเทาเข้มเล็กน้อย
-            width: 1, // ความกว้างของขอบ
+            color: const Color.fromARGB(255, 217, 217, 217), 
+            width: 1,
           ),
         ),
         child: Row(
@@ -100,5 +114,20 @@ class _Budgetcatagory extends State<Budgetcatagory> {
     );
   }
 
+  Future<bool> _checkBudgetAvailability(String valued) async {
+    // ดึงข้อมูลจากฐานข้อมูล
+    var budgets = await _databaseManagement.queryAllBudgets();
+
+    for (var budget in budgets) {
+      if (budget['ID_type_transaction'].toString() == valued) {
+        DateTime dateEnd = DateTime.parse(budget['date_end']);
+        if (DateTime.now().isBefore(dateEnd)) {
+          return true; // ถ้าเวลาปัจจุบันยังไม่เกิน dateEnd
+        }
+      }
+    }
+    return false; // ถ้าเวลาปัจจุบันเกิน dateEnd หรือไม่มีข้อมูลที่ตรงกับ valued
+  }
 }
+
 

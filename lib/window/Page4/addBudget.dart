@@ -3,6 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import '../../../database/db_manage.dart';
 import 'package:flutter/services.dart';
+import 'page4.dart';
 
 class AddBudget extends StatefulWidget {
   final String valued;
@@ -16,7 +17,6 @@ class AddBudget extends StatefulWidget {
 class _AddBudgetState extends State<AddBudget> {
   final _formKey = GlobalKey<FormBuilderState>();
   final TextEditingController _amountController = TextEditingController();
-  final TextEditingController _memoController = TextEditingController();
 
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now().add(Duration(days: 30)); // ค่าเริ่มต้นของ End Date
@@ -24,7 +24,6 @@ class _AddBudgetState extends State<AddBudget> {
   @override
   void dispose() {
     _amountController.dispose();
-    _memoController.dispose();
     super.dispose();
   }
 
@@ -46,6 +45,10 @@ class _AddBudgetState extends State<AddBudget> {
           key: _formKey,
           child: Column(
             children: [
+              Text(
+                'Selected Value: ${widget.valued}', // ใช้ widget.valued เพื่อเข้าถึงค่าที่ส่งมาจาก Budgetcatagory
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
               FormBuilderDateTimePicker(
                 name: 'startDate',
                 initialValue: _startDate,
@@ -96,20 +99,21 @@ class _AddBudgetState extends State<AddBudget> {
                   return null;
                 },
               ),
+              
+              
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.saveAndValidate()) {
-                    var typeExpense = _formKey.currentState?.value['transactionType'];
                     var startDate = _formKey.currentState?.value['startDate'];
                     var endDate = _formKey.currentState?.value['endDate'];
-                    var category = _formKey.currentState?.value['category'];
-                    var amount = _amountController.text;
-                    var memo = _memoController.text;
+                    var category = widget.valued;
+                    var capitalBudget = _amountController.text;
 
                     // Get category ID
                     int? typeTransactionId = await DatabaseManagement.instance.getTypeTransactionId(category);
 
                     if (typeTransactionId == null) {
+                      // แสดงข้อความเมื่อไม่พบ category ID
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Invalid category selected.'),
@@ -120,19 +124,16 @@ class _AddBudgetState extends State<AddBudget> {
 
                     // ข้อมูลที่ต้องการบันทึก
                     Map<String, dynamic> row = {
-                      'date_user': startDate.toString(),
-                      'end_date': endDate.toString(),
-                      'amount_transaction': double.parse(amount),
-                      'type_expense': typeExpense == '1' ? 1 : 0,
-                      'memo_transaction': memo,
+                      'date_start': startDate.toString(),
+                      'date_end': endDate.toString(),
+                      'capital_budget': double.parse(capitalBudget),
                       'ID_type_transaction': typeTransactionId,
                     };
-
                     // บันทึกข้อมูลลงฐานข้อมูล
-                    await DatabaseManagement.instance.insertTransaction(row);
+                    await DatabaseManagement.instance.insertBudget(row);
 
                     // กลับไปหน้าก่อนหน้าและส่งค่า
-                    Navigator.pop(context, true);
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Page4()),);
                   }
                 },
                 child: Text('Submit'),
