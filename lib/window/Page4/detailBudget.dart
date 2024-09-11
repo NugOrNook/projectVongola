@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
-import '../../../database/db_manage.dart';
+//import 'package:flutter_form_builder/flutter_form_builder.dart';
+//import 'package:form_builder_validators/form_builder_validators.dart';
+//import '../../../database/db_manage.dart';
 import 'package:flutter/services.dart';
 
 class DetailBudget extends StatefulWidget {
@@ -14,12 +14,12 @@ class DetailBudget extends StatefulWidget {
 }
 
 class _DetailBudget extends State<DetailBudget> {
-  final _formKey = GlobalKey<FormBuilderState>();
+  //final _formKey = GlobalKey<FormBuilderState>();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _memoController = TextEditingController();
 
-  DateTime _startDate = DateTime.now();
-  DateTime _endDate = DateTime.now().add(Duration(days: 30)); // ค่าเริ่มต้นของ End Date
+  //DateTime _startDate = DateTime.now();
+  //DateTime _endDate = DateTime.now().add(Duration(days: 30)); // ค่าเริ่มต้นของ End Date
 
   @override
   void dispose() {
