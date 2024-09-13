@@ -19,6 +19,21 @@ class _AddBudgetState extends State<AddBudget> {
 
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now().add(Duration(days: 30)); // ค่าเริ่มต้นของ End Date
+  String _typeTransactionName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTypeTransactionName();
+  }
+
+  Future<void> _loadTypeTransactionName() async {
+    int id = int.parse(widget.valued);
+    String? name = await DatabaseManagement.instance.getTypeTransactionNameById(id);
+    setState(() {
+      _typeTransactionName = name ?? 'Unknown';
+    });
+  }
 
   @override
   void dispose() {
@@ -30,7 +45,7 @@ class _AddBudgetState extends State<AddBudget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Expense & Income Log'),
+        title: Text('Add Budget'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -45,7 +60,7 @@ class _AddBudgetState extends State<AddBudget> {
           child: Column(
             children: [
               Text(
-                'Selected Value: ${widget.valued}', // ใช้ widget.valued เพื่อเข้าถึงค่าที่ส่งมาจาก Budgetcatagory
+                '$_typeTransactionName', // ใช้ชื่อ TypeTransaction
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               FormBuilderDateTimePicker(
@@ -98,8 +113,6 @@ class _AddBudgetState extends State<AddBudget> {
                   return null;
                 },
               ),
-              
-              
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.saveAndValidate()) {
@@ -108,25 +121,12 @@ class _AddBudgetState extends State<AddBudget> {
                     var category = widget.valued;
                     var capitalBudget = _amountController.text;
 
-                    // Get category ID
-                    int? typeTransactionId = await DatabaseManagement.instance.getTypeTransactionId(category);
-
-                    if (typeTransactionId == null) {
-                      // แสดงข้อความเมื่อไม่พบ category ID
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Invalid category selected.'),
-                        ),
-                      );
-                      return;
-                    }
-
                     // ข้อมูลที่ต้องการบันทึก
                     Map<String, dynamic> row = {
                       'date_start': startDate.toString(),
                       'date_end': endDate.toString(),
                       'capital_budget': double.parse(capitalBudget),
-                      'ID_type_transaction': typeTransactionId,
+                      'ID_type_transaction': category,
                     };
                     // บันทึกข้อมูลลงฐานข้อมูล
                     await DatabaseManagement.instance.insertBudget(row);

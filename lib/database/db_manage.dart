@@ -20,7 +20,7 @@ class DatabaseManagement {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();                          
     final path = join(dbPath, filePath);      
-    await deleteDatabase(path); // ลบฐานข้อมูลหากมีอยู่แล้ว                        
+    //await deleteDatabase(path); // ลบฐานข้อมูลหากมีอยู่แล้ว                        
     return await openDatabase(path, version: 1, onCreate: _createDB); 
   }
 
@@ -98,7 +98,7 @@ class DatabaseManagement {
       columnDateEnd: '2024-10-31T23:59:59',
     });
 
-    //-----------------------------------------------------------------------------------
+   //-----------------------------------------------------------------------------------
   } 
  
   Future<int> insertTransaction(Map<String, dynamic> row) async {
@@ -165,15 +165,20 @@ class DatabaseManagement {
   }
 
   // ---------------------------{ delete ตาราง }----------------------------
-  Future<int> deleteAllTransactions() async {
-    final db = await instance.database;
-    return await db.delete('transactions');
-  }
+  // Future<int> deleteAllTransactions() async {
+  //   final db = await instance.database;
+  //   return await db.delete('transactions');
+  // }
+  
+  // Future<int> deleteAllBudgets() async {
+  //   final db = await instance.database;
+  //   return await db.delete('Budget');
+  // }
 
-  Future close() async {
-    final db = await instance.database;
-    db.close();
-  }
+  // Future close() async {
+  //   final db = await instance.database;
+  //   db.close();
+  // }
   // ------------------------------------------------------
   Future<void> showAllData() async {
     Database db = await instance.database;
@@ -200,6 +205,17 @@ class DatabaseManagement {
     });
   }
 
+  Future<Map<int, String>> getTypeTransactionsMap() async {
+    Database db = await instance.database;
+    List<Map<String, dynamic>> results = await db.query(tableTypeTransaction);
+    Map<int, String> typeMap = {};
+    for (var row in results) {
+      typeMap[row['ID_type_transaction']] = row['type_transaction'];
+    }
+    return typeMap;
+  }
+  
+  //ดึง ID_type_transaction จาก type_transaction
   Future<int?> getTypeTransactionId(String category) async {
     Database db = await DatabaseManagement.instance.database;
     List<Map<String, dynamic>> results = await db.query(
@@ -214,4 +230,21 @@ class DatabaseManagement {
     }
     return null;
   }
+
+  //ดึง type_transaction จาก ID_type_transaction
+  Future<String?> getTypeTransactionNameById(int id) async {
+    Database db = await instance.database;
+    List<Map<String, dynamic>> results = await db.query(
+      tableTypeTransaction,
+      columns: ['type_transaction'],
+      where: 'ID_type_transaction = ?',
+      whereArgs: [id],
+    );
+
+    if (results.isNotEmpty) {
+      return results.first['type_transaction'];
+    }
+    return null;
+  }
+
 }

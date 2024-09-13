@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'addBudget.dart';
+import 'pageAddBudget.dart';
 import 'detailBudget.dart'; // เพิ่ม import สำหรับ detailBudget page
 import '../../database/db_manage.dart'; // เพิ่ม import สำหรับ DatabaseManagement
 
@@ -29,16 +29,16 @@ class _Budgetcatagory extends State<Budgetcatagory> {
             child: ListView(
               padding: const EdgeInsets.only(bottom: 16, left: 20, right: 20, top: 20),
               children: [
-                _buildBudgetItem('assets/food.png', "Food", 'Food'),
-                _buildBudgetItem('assets/travel_expenses.png', "Travel expenses", 'Travel expenses'),
-                _buildBudgetItem('assets/water_bill.png', "Water bill", 'Water bill'),
-                _buildBudgetItem('assets/electricity_bill.png', "Electricity bill", 'Electricity bill'),
-                _buildBudgetItem('assets/house.png', "House cost", 'House cost'),
-                _buildBudgetItem('assets/car.png', "Car fare", 'Car fare'),
-                _buildBudgetItem('assets/gasoline_cost.png', "Gasoline cost", 'Gasoline cost'),
-                _buildBudgetItem('assets/medical.png', "Medical", 'Medical expenses'),
-                _buildBudgetItem('assets/beauty.png', "Beauty", 'Beauty expenses'),
-                _buildBudgetItem('assets/Other.png', "Other", 'Other'),
+                _buildBudgetItem('assets/food.png', "Food", '1'),
+                _buildBudgetItem('assets/travel_expenses.png', "Travel expenses", '2'),
+                _buildBudgetItem('assets/water_bill.png', "Water bill", '3'),
+                _buildBudgetItem('assets/electricity_bill.png', "Electricity bill", '4'),
+                _buildBudgetItem('assets/house.png', "House cost", '5'),
+                _buildBudgetItem('assets/car.png', "Car fare", '6'),
+                _buildBudgetItem('assets/gasoline_cost.png', "Gasoline cost", '7'),
+                _buildBudgetItem('assets/medical.png', "Medical", '8'),
+                _buildBudgetItem('assets/beauty.png', "Beauty", '9'),
+                _buildBudgetItem('assets/Other.png', "Other", '10'),
               ],
             ),
           ),
@@ -118,16 +118,34 @@ class _Budgetcatagory extends State<Budgetcatagory> {
     // ดึงข้อมูลจากฐานข้อมูล
     var budgets = await _databaseManagement.queryAllBudgets();
 
-    for (var budget in budgets) {
-      if (budget['ID_type_transaction'].toString() == valued) {
-        DateTime dateEnd = DateTime.parse(budget['date_end']);
-        if (DateTime.now().isBefore(dateEnd)) {
-          return true; // ถ้าเวลาปัจจุบันยังไม่เกิน dateEnd
-        }
+    // หาข้อมูลที่ ID_type_transaction ตรงกับ valued
+    var matchedBudgets = budgets.where((budget) => budget['ID_type_transaction'].toString() == valued);
+
+    // ถ้าไม่มีข้อมูลที่ตรงกับ valued เลย ให้ return false
+    if (matchedBudgets.isEmpty) {
+      return false;
+    }
+
+    // ถ้ามีข้อมูลที่ตรงกับ valued
+    for (var budget in matchedBudgets) {
+      DateTime dateEnd;
+      try {
+        dateEnd = DateTime.parse(budget['date_end']);
+      } catch (e) {
+        print('Error parsing date: ${budget['date_end']}');
+        continue; // ข้ามการวนลูปนี้ไปถ้าแปลงวันที่ล้มเหลว
+      }
+
+      // ตรวจสอบว่าเวลาปัจจุบันเกิน dateEnd หรือไม่
+      if (DateTime.now().isBefore(dateEnd)) {
+        return true; // ถ้าเวลาปัจจุบันยังไม่เกิน dateEnd
       }
     }
-    return false; // ถ้าเวลาปัจจุบันเกิน dateEnd หรือไม่มีข้อมูลที่ตรงกับ valued
+
+    // ถ้าทุกแถวที่ตรงกับ valued นั้นเวลาปัจจุบันเกิน dateEnd หมดแล้ว
+    return false;
   }
+
 }
 
 
