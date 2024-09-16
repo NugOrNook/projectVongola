@@ -32,6 +32,7 @@ class CreateBudget extends StatefulWidget {
 class _CreateBudgetState extends State<CreateBudget> {
   final DatabaseManagement _databaseManagement = DatabaseManagement.instance;
 
+  // ลบข้อมูลในตาราง budget
   // @override
   // void initState() {
   //   super.initState();
@@ -106,6 +107,7 @@ class _CreateBudgetState extends State<CreateBudget> {
             ],
           ),
         ),
+        // ตรวจสอบข้อมูลในตาราง budget
         // Expanded(
         //   child: BudgetList(), // ใช้ BudgetList แทน ListView
         // ),
