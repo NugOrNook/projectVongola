@@ -5,7 +5,6 @@ import 'package:intl/intl.dart'; // ใช้สำหรับจัดกา�
 
 class DetailBudget extends StatefulWidget {
   final String valued;
-
   DetailBudget({required this.valued});
 
   @override
@@ -13,17 +12,15 @@ class DetailBudget extends StatefulWidget {
 }
 
 class _DetailBudget extends State<DetailBudget> {
-  final _formKey = GlobalKey<FormBuilderState>();
   final TextEditingController _amountController = TextEditingController();
   late Future<List<Map<String, dynamic>>> _filteredBudgets; // สร้างตัวแปรใหม่สำหรับ filtered budgets
-  late Future<Map<int, String>> _typeTransactions;
 
   String _typeTransactionName = '';
 
   @override
   void initState() {
     super.initState();
-    _typeTransactions = DatabaseManagement.instance.getTypeTransactionsMap();
+
     _filteredBudgets = _loadFilteredBudgets(); // โหลดข้อมูล budgets ที่กรองแล้ว
     _loadTypeTransactionName();
   }
@@ -58,7 +55,7 @@ class _DetailBudget extends State<DetailBudget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Budget'),
+        title: Text('Budget Detail'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -66,7 +63,7 @@ class _DetailBudget extends State<DetailBudget> {
           },
         ),
       ),
-      body: Padding( // เพิ่ม Padding รอบนอกของ Container
+      body: Padding( 
         padding: const EdgeInsets.only(bottom: 16, left: 20, right: 20),
         child: Container(
           margin: const EdgeInsets.only(bottom: 16.0),
@@ -94,19 +91,23 @@ class _DetailBudget extends State<DetailBudget> {
                 ],
               ),
               SizedBox(height: 8),
-              Expanded(
-                child: _buildBudgetList(), // ListView จะขยายพื้นที่ได้ตามที่ต้องการ
-                
+              
+              // กำหนดขนาดให้ ListView เพื่อไม่ให้ขยับ
+              SizedBox(
+                height: 200, // ระบุขนาดคงที่ให้กับ ListView
+                child: _buildBudgetList(), 
               ),
+
               Row(
                 children: [
                   Expanded(
-                    child: Text('...',
+                    child: Text(
+                      '...',
                       textAlign: TextAlign.center, // จัดตำแหน่งข้อความให้ตรงกลาง
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    )
-                  )
-                ]
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -114,6 +115,7 @@ class _DetailBudget extends State<DetailBudget> {
       ),
     );
   }
+
 
   @override
   Widget _buildBudgetList() {

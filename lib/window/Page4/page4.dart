@@ -4,8 +4,9 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'pageAddBudget.dart';
 import 'detailBudget.dart'; // เพิ่ม import สำหรับ detailBudget page
 import '../../database/db_manage.dart'; // เพิ่ม import สำหรับ DatabaseManagement
+import 'budgetCompared.dart';
 
-import 'show.dart';
+//import 'show.dart';
 
 class Page4 extends StatefulWidget {
   @override
@@ -17,7 +18,10 @@ class _BugetPage extends State<Page4> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Budget Management'),
+        title: Padding(
+          padding: EdgeInsets.only(left: 10), // กำหนด padding ซ้าย 20
+          child: Text('Budget'),
+        ),
       ),
       body: CreateBudget(),
     );
@@ -32,7 +36,7 @@ class CreateBudget extends StatefulWidget {
 class _CreateBudgetState extends State<CreateBudget> {
   final DatabaseManagement _databaseManagement = DatabaseManagement.instance;
 
-  // ลบข้อมูลในตาราง budget
+  //ลบข้อมูลในตาราง budget
   // @override
   // void initState() {
   //   super.initState();
@@ -98,19 +102,11 @@ class _CreateBudgetState extends State<CreateBudget> {
           ),
         ),
         Expanded(
-          child: ListView(
-            padding: const EdgeInsets.only(bottom: 16, left: 20, right: 20),
-            children: [
-              _buildBudgetItem('assets/food.png', "Food", 2000, 1850),
-              _buildBudgetItem('assets/car.png', "Car fare", 1500, 950),
-              _buildBudgetItem('assets/beauty.png', "Beauty", 2000, 100),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20), // กำหนดขอบซ้ายขวา 20 หน่วย
+            child: BudgetComparedList(),
           ),
         ),
-        // ตรวจสอบข้อมูลในตาราง budget
-        // Expanded(
-        //   child: BudgetList(), // ใช้ BudgetList แทน ListView
-        // ),
       ],
     );
   }
@@ -223,63 +219,6 @@ class _CreateBudgetState extends State<CreateBudget> {
             ),
           ),
           SizedBox(height: 8),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBudgetItem(String imagePath, String label, double budget, double balance) {
-    double progress = balance / budget;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16.0),
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color.fromARGB(255, 217, 217, 217),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.grey[200],
-            ),
-            child: Image.asset(
-              imagePath,
-              width: 40,
-              height: 40,
-            ),
-          ),
-          SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text('Budget: ${budget.toStringAsFixed(0)} ฿'),
-                Text('Balance: ${balance.toStringAsFixed(0)} ฿'),
-                SizedBox(height: 8),
-                LinearProgressIndicator(
-                  value: progress,
-                  backgroundColor: Colors.grey[300],
-                  color: progress > 0.8 ? Colors.red : Colors.blue,
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
