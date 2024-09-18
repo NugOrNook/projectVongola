@@ -1,9 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // สำหรับจัดการวันที่
-import '../../database/db_manage.dart'; // นำเข้า class DatabaseManagement ของคุณ
+import '../../database/db_manage.dart'; 
+import 'package:shared_preferences/shared_preferences.dart';
 
-class BudgetComparedList extends StatelessWidget {
-  
+class BudgetComparedList extends StatefulWidget {
+  @override
+  _BudgetComparedListState createState() => _BudgetComparedListState();
+}
+
+class _BudgetComparedListState extends State<BudgetComparedList> {
+  Map<int, bool> _alertShownMap = {}; // เก็บสถานะแจ้งเตือนแยกตาม idTypeTransaction
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfAlertShownToday(); // เรียกใช้งานฟังก์ชันตรวจสอบเมื่อเริ่มต้น
+  }
+
+  // ตรวจสอบว่าการแจ้งเตือนเคยแสดงในวันนี้สำหรับแต่ละ idTypeTransaction หรือยัง
+  Future<void> _checkIfAlertShownToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    final todayMidnight = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final today = DateFormat('yyyy-MM-dd').format(todayMidnight);
+
+    for (int idTypeTransaction = 1; idTypeTransaction <= 10; idTypeTransaction++) {
+      final lastAlertDate = prefs.getString('lastAlertDate_$idTypeTransaction'); // วันที่ที่แจ้งเตือนล่าสุดของแต่ละ id
+      if (lastAlertDate == today) {
+        _alertShownMap[idTypeTransaction] = true; // แจ้งเตือนถูกแสดงแล้วในวันนี้
+      } else {
+        _alertShownMap[idTypeTransaction] = false; // แจ้งเตือนยังไม่ถูกแสดง
+      }
+    }
+  }
+
+  // บันทึกวันที่ปัจจุบันเมื่อแสดงการแจ้งเตือน
+  Future<void> _setAlertShownToday(int idTypeTransaction) async {
+    final prefs = await SharedPreferences.getInstance();
+    final todayMidnight = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final today = DateFormat('yyyy-MM-dd').format(todayMidnight);
+    await prefs.setString('lastAlertDate_$idTypeTransaction', today); // บันทึกวันที่ปัจจุบันแยกตาม id
+  }
+
   Future<List<Map<String, dynamic>>> fetchBudgetData() async {
     final db = DatabaseManagement.instance;
     final now = DateTime.now();
@@ -98,6 +135,41 @@ class BudgetComparedList extends StatelessWidget {
     }
   }
 
+  void _showAlertDialog(BuildContext context, String typeTransaction, double balance, int idTypeTransaction) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Image.asset(
+                'assets/warning_1.png', // รูปโลโก้หรือรูปอื่นๆ ที่คุณต้องการ
+                width: 40,
+                height: 40,
+              ),
+              SizedBox(width: 8),
+              Text('Warning'),
+            ],
+          ),
+          content: Text(
+              'The budget for $typeTransaction is over 80%. The balance is ${balance.toStringAsFixed(2)} ฿.'),
+          actions: [
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _setAlertShownToday(idTypeTransaction);  // บันทึกการแสดงแจ้งเตือนในวันนี้สำหรับ id นี้
+                },
+                child: Text('I Agree'),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Map<String, dynamic>>>(
@@ -116,9 +188,16 @@ class BudgetComparedList extends StatelessWidget {
           itemBuilder: (context, index) {
             final budgetData = budgetList[index];
             final double budget = budgetData['budget'];
-            final double balance = budgetData['balance'];
+            final double balance = budgetData['budget'] - budgetData['balance'];
             final double progress = budgetData['progress'];
             final int idTypeTransaction = budgetData['idTypeTransaction'];
+
+            // แสดงการแจ้งเตือนเมื่อ progress > 0.8 และยังไม่เคยแสดงมาก่อนในวันนี้สำหรับ id นี้
+            if (progress > 0.8 && _alertShownMap[idTypeTransaction] == false) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _showAlertDialog(context, getText(idTypeTransaction), balance, idTypeTransaction);
+              });
+            }
 
             return Container(
               margin: const EdgeInsets.only(bottom: 16.0),
@@ -158,8 +237,20 @@ class BudgetComparedList extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 4),
-                        Text('Budget: ${budget.toStringAsFixed(0)} ฿'),
-                        Text('Balance: ${balance.toStringAsFixed(0)} ฿'),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Budget'),
+                            Text('${budget.toStringAsFixed(0)} ฿'),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Balance'),
+                            Text('${balance.toStringAsFixed(0)} ฿'),
+                          ],
+                        ),
                         SizedBox(height: 8),
                         LinearProgressIndicator(
                           value: progress,

@@ -83,6 +83,9 @@ flutter:
     - assets/beauty.png
     - assets/Other.png
 
+    - assets/warning_1.png
+    - assets/warning_2.png
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

@@ -121,6 +121,9 @@ class _AddBudgetState extends State<AddBudget> {
                     var category = widget.valued;
                     var capitalBudget = _amountController.text;
 
+                    // ปรับค่า startDate ให้เป็นเวลาเที่ยงคืน
+                    startDate = DateTime(startDate.year, startDate.month, startDate.day);
+                    
                     // ข้อมูลที่ต้องการบันทึก
                     Map<String, dynamic> row = {
                       'date_start': startDate.toString(),
