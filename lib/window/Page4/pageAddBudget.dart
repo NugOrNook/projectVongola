@@ -135,7 +135,7 @@ class _AddBudgetState extends State<AddBudget> {
                     await DatabaseManagement.instance.insertBudget(row);
 
                     // กลับไปหน้าก่อนหน้าและส่งค่า
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Page4()),);
+                    Navigator.pop(context, true);
                   }
                 },
                 child: Text('Submit'),

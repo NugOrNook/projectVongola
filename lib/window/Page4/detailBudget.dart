@@ -12,16 +12,22 @@ class DetailBudget extends StatefulWidget {
 }
 
 class _DetailBudget extends State<DetailBudget> {
+  final _formKey = GlobalKey<FormBuilderState>();
+
   final TextEditingController _amountController = TextEditingController();
-  late Future<List<Map<String, dynamic>>> _filteredBudgets; // สร้างตัวแปรใหม่สำหรับ filtered budgets
+  final TextEditingController _startDateController = TextEditingController();
+  final TextEditingController _endDateController = TextEditingController();
+
+  late Future<List<Map<String, dynamic>>> _filteredBudgets;
 
   String _typeTransactionName = '';
+  int? _idBudget; // ตัวแปรเพื่อเก็บ ID_budget
+  bool _isEditing = false; // ควบคุมสถานะการแก้ไข
 
   @override
   void initState() {
     super.initState();
-
-    _filteredBudgets = _loadFilteredBudgets(); // โหลดข้อมูล budgets ที่กรองแล้ว
+    _filteredBudgets = _loadFilteredBudgets();
     _loadTypeTransactionName();
   }
 
@@ -36,8 +42,7 @@ class _DetailBudget extends State<DetailBudget> {
   Future<List<Map<String, dynamic>>> _loadFilteredBudgets() async {
     int idTypeTransaction = int.parse(widget.valued);
     List<Map<String, dynamic>> budgets = await DatabaseManagement.instance.queryAllBudgets();
-    
-    // กรองข้อมูลให้ตรงกับ ID_type_transaction และ DateEnd ไม่เกินเวลาปัจจุบัน
+
     DateTime now = DateTime.now();
     return budgets.where((budget) {
       DateTime dateEnd = DateTime.parse(budget['date_end']);
@@ -48,6 +53,8 @@ class _DetailBudget extends State<DetailBudget> {
   @override
   void dispose() {
     _amountController.dispose();
+    _startDateController.dispose();
+    _endDateController.dispose();
     super.dispose();
   }
 
@@ -63,7 +70,7 @@ class _DetailBudget extends State<DetailBudget> {
           },
         ),
       ),
-      body: Padding( 
+      body: Padding(
         padding: const EdgeInsets.only(bottom: 16, left: 20, right: 20),
         child: Container(
           margin: const EdgeInsets.only(bottom: 16.0),
@@ -80,7 +87,6 @@ class _DetailBudget extends State<DetailBudget> {
             children: [
               Row(
                 children: [
-                  SizedBox(width: 16),
                   Expanded(
                     child: Text(
                       _typeTransactionName,
@@ -90,24 +96,12 @@ class _DetailBudget extends State<DetailBudget> {
                   ),
                 ],
               ),
-              SizedBox(height: 8),
-              
+              SizedBox(height: 10),
+
               // กำหนดขนาดให้ ListView เพื่อไม่ให้ขยับ
               SizedBox(
-                height: 200, // ระบุขนาดคงที่ให้กับ ListView
-                child: _buildBudgetList(), 
-              ),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      '...',
-                      textAlign: TextAlign.center, // จัดตำแหน่งข้อความให้ตรงกลาง
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
+                height: 300, // ระบุขนาดคงที่ให้กับ ListView
+                child: _isEditing ? _buildEditForm(_idBudget!) : _buildBudgetList(),
               ),
             ],
           ),
@@ -115,12 +109,11 @@ class _DetailBudget extends State<DetailBudget> {
       ),
     );
   }
-
-
-  @override
+  
+  // แสดงข้อมูลรายการ budget
   Widget _buildBudgetList() {
     return FutureBuilder<List<Map<String, dynamic>>>(
-      future: _filteredBudgets, // ใช้ budgets ที่กรองแล้ว
+      future: _filteredBudgets,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -136,38 +129,156 @@ class _DetailBudget extends State<DetailBudget> {
               final budget = budgets[index];
               String formattedStartDate = DateFormat('dd MMMM yyyy').format(DateTime.parse(budget['date_start']));
               String formattedEndDate = DateFormat('dd MMMM yyyy').format(DateTime.parse(budget['date_end']));
+              String StartDate = DateFormat('yyyy-MM-dd').format(DateTime.parse(budget['date_start']));
+              String EndDate = DateFormat('yyyy-MM-dd').format(DateTime.parse(budget['date_end']));
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Capital', style: TextStyle(fontSize: 16)),
-                      Text('${budget['capital_budget']} ฿', style: TextStyle(fontSize: 16)),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Start date', style: TextStyle(fontSize: 16)),
-                      Text('$formattedStartDate', style: TextStyle(fontSize: 16)),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('End date', style: TextStyle(fontSize: 16)),
-                      Text('$formattedEndDate', style: TextStyle(fontSize: 16)),
-                    ],
-                  ),
-                  SizedBox(height: 8), // เพิ่มระยะห่างระหว่างรายการ
-                ],
+              return GestureDetector(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Capital', style: TextStyle(fontSize: 16)),
+                        Text('${budget['capital_budget']} ฿', style: TextStyle(fontSize: 16)),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Start date', style: TextStyle(fontSize: 16)),
+                        Text('$formattedStartDate', style: TextStyle(fontSize: 16)),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('End date', style: TextStyle(fontSize: 16)),
+                        Text('$formattedEndDate', style: TextStyle(fontSize: 16)),
+                      ],
+                    ),
+                    SizedBox(height: 50), // เพิ่มระยะห่างระหว่างรายการ
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _idBudget = budget['ID_budget'];
+                                _amountController.text = budget['capital_budget'].toString();
+                                _startDateController.text = StartDate;
+                                _endDateController.text = EndDate;
+                                _isEditing = !_isEditing;
+                              });
+                            },
+                            child: Text('Edit'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               );
             },
           );
         }
       },
+    );
+  }
+
+  // ฟอร์มแก้ไขข้อมูล budget
+  Widget _buildEditForm(int _idBudget) {
+    final int idBudget = _idBudget;
+
+    return Container(
+      padding: EdgeInsets.all(10),
+      child: FormBuilder(
+        key: _formKey,
+        child: Column(
+          children: [
+            FormBuilderTextField(
+              name: 'amountController',
+              controller: _amountController,
+              decoration: InputDecoration(labelText: 'Capital Budget'),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter the amount of money';
+                }
+                if (double.tryParse(value) == null) {
+                  return 'Please enter a valid number';
+                }
+                return null;
+              },
+            ),
+            FormBuilderDateTimePicker(
+              name: 'startDate',
+              initialValue: DateFormat('yyyy-MM-dd').parse(_startDateController.text), // ใช้ค่า initialValue แทน controller
+              decoration: InputDecoration(labelText: 'Start Date'),
+              firstDate: DateTime(2000),
+              lastDate: DateTime(2100),
+              inputType: InputType.date,
+              locale: Locale('th'),
+            ),
+            FormBuilderDateTimePicker(
+              name: 'endDate',
+              initialValue: DateFormat('yyyy-MM-dd').parse(_endDateController.text), // ใช้ค่า initialValue แทน controller
+              decoration: InputDecoration(labelText: 'End Date'),
+              firstDate: DateTime(2000),
+              lastDate: DateTime(2100),
+              inputType: InputType.date,
+              locale: Locale('th'),
+            ),  
+            SizedBox(height: 50),
+
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.saveAndValidate()) {
+                        var startDate = _formKey.currentState?.value['startDate'];
+                        var endDate = _formKey.currentState?.value['endDate'];
+                        var capitalBudget = _amountController.text;
+
+                        print("Updating budget with ID: 222222222----------------------------------------------   $idBudget");
+                        
+                        // ตั้งค่าเวลาให้เป็นเที่ยงคืน
+                        DateTime startDateTime = DateTime(startDate.year, startDate.month, startDate.day, 0, 0, 0);
+                        DateTime endDateTime = DateTime(endDate.year, endDate.month, endDate.day, 0, 0, 0);
+
+                        // ข้อมูลที่ต้องการบันทึก (บันทึกในรูปแบบ yyyy-MM-dd HH:mm:ss.SSS)
+                        Map<String, dynamic> row = {
+                          'date_start': startDateTime.toIso8601String(),  // แปลงเป็นรูปแบบ ISO 8601
+                          'date_end': endDateTime.toIso8601String(),
+                          'capital_budget': double.parse(capitalBudget),
+                        };
+
+                        // อัปเดตข้อมูลในฐานข้อมูล
+                        await DatabaseManagement.instance.updateBudget(row, idBudget);
+                        
+                        print("Budget updated successfully.");
+
+                        // กลับไปหน้าก่อนหน้า
+                        Navigator.pop(context, true); // ส่งค่ากลับว่าเสร็จเรียบร้อย
+                        // กลับไปหน้าก่อนหน้า
+                        // Navigator.pushReplacement(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => DetailBudget(valued: widget.valued),
+                        //   ),
+                        // );
+                      }
+                    },
+                    child: Text('Save'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

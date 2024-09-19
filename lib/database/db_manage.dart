@@ -131,10 +131,10 @@ class DatabaseManagement {
     return await db.query(tableBudget);
   }
 
-  Future<int> updateBudget(Map<String, dynamic> row) async {
+  Future<int> updateBudget(Map<String, dynamic> row, int idBudget) async {
+    print("Selected Budget ID: 5555555555555 $idBudget");
     Database db = await instance.database;
-    int id = row['ID_budget'];
-    return await db.update(tableBudget, row, where: 'ID_budget = ?', whereArgs: [id]);
+    return await db.update(tableBudget, row, where: 'ID_budget = ?', whereArgs: [idBudget],);
   }
 
   Future<int> deleteBudget(int id) async {
@@ -246,4 +246,21 @@ class DatabaseManagement {
     return null;
   }
 
+  // ตัวอย่างของการกำหนด method สำหรับการดึงข้อมูล budget ตาม ID_budget
+  Future<Map<String, dynamic>?> getBudgetById(int idBudget) async {
+    final db = await instance.database;
+
+    // Query ข้อมูลจากฐานข้อมูล โดยเลือกจากตาราง budget ที่ ID_budget ตรงกับที่ระบุ
+    final result = await db.query(
+      'budget',
+      where: 'ID_budget = ?',
+      whereArgs: [idBudget],
+    );
+
+    if (result.isNotEmpty) {
+      return result.first; // ถ้าพบข้อมูล จะส่งข้อมูลแถวแรกกลับไป
+    } else {
+      return null; // ถ้าไม่พบข้อมูล
+    }
+  }
 }

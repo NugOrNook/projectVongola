@@ -5,6 +5,7 @@ import 'pageAddBudget.dart';
 import 'detailBudget.dart'; // เพิ่ม import สำหรับ detailBudget page
 import '../../database/db_manage.dart'; // เพิ่ม import สำหรับ DatabaseManagement
 import 'budgetCompared.dart';
+import 'package:intl/intl.dart';
 
 //import 'show.dart';
 
@@ -35,7 +36,7 @@ class CreateBudget extends StatefulWidget {
 
 class _CreateBudgetState extends State<CreateBudget> {
   final DatabaseManagement _databaseManagement = DatabaseManagement.instance;
-
+  
   //ลบข้อมูลในตาราง budget
   // @override
   // void initState() {
@@ -116,19 +117,31 @@ class _CreateBudgetState extends State<CreateBudget> {
       onTap: () async {
         bool shouldNavigateToDetail = await _checkBudgetAvailability(valued);
         if (shouldNavigateToDetail) {
-          Navigator.push(
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => DetailBudget(valued: valued),
             ),
           );
+          
+          if (result == true) {
+            // รีเฟรช UI 
+            setState(() {
+            });
+          }
         } else {
-          Navigator.push(
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => AddBudget(valued: valued),
             ),
           );
+          
+          if (result == true) {
+            // รีเฟรช UI
+            setState(() {
+            });
+          }
         }
       },
       child: Column(
