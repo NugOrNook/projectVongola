@@ -132,7 +132,6 @@ class DatabaseManagement {
   }
 
   Future<int> updateBudget(Map<String, dynamic> row, int idBudget) async {
-    print("Selected Budget ID: 5555555555555 $idBudget");
     Database db = await instance.database;
     return await db.update(tableBudget, row, where: 'ID_budget = ?', whereArgs: [idBudget],);
   }

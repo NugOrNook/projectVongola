@@ -242,8 +242,6 @@ class _DetailBudget extends State<DetailBudget> {
                         var endDate = _formKey.currentState?.value['endDate'];
                         var capitalBudget = _amountController.text;
 
-                        print("Updating budget with ID: 222222222----------------------------------------------   $idBudget");
-                        
                         // ตั้งค่าเวลาให้เป็นเที่ยงคืน
                         DateTime startDateTime = DateTime(startDate.year, startDate.month, startDate.day, 0, 0, 0);
                         DateTime endDateTime = DateTime(endDate.year, endDate.month, endDate.day, 0, 0, 0);
@@ -257,8 +255,6 @@ class _DetailBudget extends State<DetailBudget> {
 
                         // อัปเดตข้อมูลในฐานข้อมูล
                         await DatabaseManagement.instance.updateBudget(row, idBudget);
-                        
-                        print("Budget updated successfully.");
 
                         // กลับไปหน้าก่อนหน้า
                         Navigator.pop(context, true); // ส่งค่ากลับว่าเสร็จเรียบร้อย

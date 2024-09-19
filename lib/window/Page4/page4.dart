@@ -211,10 +211,16 @@ class _CreateBudgetState extends State<CreateBudget> {
   Widget _buildAddButton(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        await Navigator.push(
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => Budgetcatagory()),
         );
+
+        if (result == true) {
+          setState(() {
+            // รีเฟรชหน้าใหม่ที่นี่
+          });
+        }
       },
       child: Column(
         children: [

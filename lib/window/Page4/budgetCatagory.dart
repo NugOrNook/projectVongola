@@ -53,21 +53,29 @@ class _Budgetcatagory extends State<Budgetcatagory> {
         // ตรวจสอบข้อมูลก่อนนำทาง
         bool shouldNavigateToDetail = await _checkBudgetAvailability(valued);
         if (shouldNavigateToDetail) {
-          Navigator.push(
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => DetailBudget(valued: valued), // ไปที่หน้า detailBudget
+              builder: (context) => DetailBudget(valued: valued),
             ),
           );
+          if (result == true) {
+            Navigator.pop(context, true); // ส่งค่า true กลับไปยัง page4.dart
+          }
         } else {
-          Navigator.push(
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddBudget(valued: valued), // ไปที่หน้า AddBudget
+              builder: (context) => AddBudget(valued: valued),
             ),
           );
+          
+          if (result == true) {
+            Navigator.pop(context, true); // ส่งค่า true กลับไปยัง page4.dart
+          }
         }
       },
+      
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16.0),
