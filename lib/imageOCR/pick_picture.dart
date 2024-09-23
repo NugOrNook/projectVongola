@@ -1,11 +1,11 @@
+import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageOcrHelper {
-  final ImagePicker _picker = ImagePicker();
-  final TextRecognizer _textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+  final ImagePicker _picker = ImagePicker(); //class ImagePicker มีอยู่แล้ว ใช้เพื่อเอาไว้เลือกรูป _picker เป็นตัวแปรที่เก็บอินสแตนซ์ของ ImagePicker ไว้ และใช้เพื่อเข้าถึงเมธอดต่างๆ ของ ImagePicker เช่น การเลือกภาพจากแกลเลอรีหรือถ่ายภาพด้วยกล้อง
+  final TextRecognizer _textRecognizer = TextRecognizer();//class TextRecognizer มีอยู่แล้วเหมือนกัน
 
-  // ฟังก์ชันสำหรับเลือกภาพจากแกลเลอรีและดึงข้อความ
   Future<String?> pickImageAndExtractText() async { //ฟังก์ชั่นจิ้มรูป
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -14,14 +14,12 @@ class ImageOcrHelper {
     return null;
   }
 
-
-  // ฟังก์ชันสำหรับดึงข้อความจากภาพที่แชร์หรือถูกเลือก
   Future<String?> extractTextFromImage(String path) async {
     final inputImage = InputImage.fromFilePath(path);
     final RecognizedText recognizedText = await _textRecognizer.processImage(inputImage);
 
     String extractedText = '';
-    
+
     for (TextBlock block in recognizedText.blocks) {
       // วนลูปผ่าน TextLine แต่ละบรรทัดใน block
       for (TextLine line in block.lines) {
@@ -35,23 +33,20 @@ class ImageOcrHelper {
           }
         }
       }
-    }
+      }
 
-    await _textRecognizer.close(); // ปิดการทำงานของ OCR หลังจากเสร็จสิ้นการประมวลผล
+    await _textRecognizer.close();  // ปิด TextRecognizer
 
-    // ใช้ RegExp เพื่อค้นหาและกรองเฉพาะตัวเลขทศนิยม
-    final RegExp decimalPattern = RegExp(r'\b\d{1,3}(?:,\d{3})*(?:\.\d{2})\b');
+    final RegExp decimalPattern = RegExp(r'(จำนวนเงิน)?\s*(\d{1,3}(?:,\d{3})*\.\d{2})\s*');
     final Iterable<Match> matches = decimalPattern.allMatches(extractedText);
 
-    // รวมค่าทศนิยมทั้งหมดเข้าด้วยกัน
     double totalAmount = matches.isNotEmpty
         ? matches.map((match) {
-            String numberString = match.group(0)!.replaceAll(',', ''); // ลบลูกน้ำออก
-            return double.parse(numberString);
-          }).reduce((a, b) => a + b)
+      String numberString = match.group(0)!.replaceAll(',', ''); // ลบลูกน้ำออก
+      return double.parse(numberString);
+    }).reduce((a, b) => a + b)
         : 0.0;
 
-    // คืนค่าเป็น Map ที่เก็บจำนวนเงิน, memo และ datetime
     return totalAmount.toStringAsFixed(2);
   }
 }

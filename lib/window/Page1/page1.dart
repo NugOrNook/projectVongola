@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'pageAddLog.dart';
+import 'package:vongola/window/Page1/pageAddLog.dart';
 import '../../database/db_manage.dart';
 import 'CardDashBoard.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'CardFinancial.dart';
 
 class Page1 extends StatefulWidget {
@@ -11,18 +13,53 @@ class Page1 extends StatefulWidget {
 
 class _Introduction extends State<Page1> {
   late Future<List<Map<String, dynamic>>> _transactionsFuture;
+  late StreamSubscription _intentSub;
+  late String sharingFile = '';
 
   @override
   void initState() {
     super.initState();
     _transactionsFuture = DatabaseManagement.instance.queryAllTransactions();
+    _intentSub = ReceiveSharingIntent.instance.getMediaStream().listen((value) {
+        setState(() {
+       // _sharedFiles.clear();
+        print("***************************144*****144");
+       // _sharedFiles.addAll(value);
+
+        List<SharedMediaFile> sharedFile = value;
+        print(sharedFile[0].path);
+        Navigator.pushNamed(context, '/addTransactionPage',arguments: sharedFile[0].path);
+
+        print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+
+        });
+      }, onError: (err) {
+        print("getIntentDataStream error: $err");
+      });
+    // Get the media sharing coming from outside the app while the app is closed.
+    // ReceiveSharingIntent.instance.getInitialMedia().then((value) {
+    //   setState(() {
+    //     print("***************************155555555555555*****15555555555555555");
+    //
+    //     Navigator.pushNamed(context, 'addTransactionPage');
+    //     // Tell the library that we are done processing the intent.
+    //     ReceiveSharingIntent.instance.reset();
+    //   });
+    // });
   }
+
   void _refreshTransactions() {
     setState(() {
       _transactionsFuture = DatabaseManagement.instance.queryAllTransactions();
     });
   }
 
+  @override
+  void dispose() {
+    _intentSub.cancel();
+    super.dispose();
+  }
+  
   @override
   Widget build(BuildContext context) => Scaffold(
     body: Column(

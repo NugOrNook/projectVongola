@@ -502,3 +502,299 @@
 // //     return null;
 // //   }
 // // }
+
+
+// import 'package:flutter/material.dart';
+// import 'window/Page1/page1.dart';
+// import 'window/Page1/pageAddLog.dart';
+// import 'window/page2.dart';
+// import 'window/page3.dart';
+// import 'window/Page4/page4.dart';
+// import '../database/db_manage.dart';
+// import 'package:intl/date_symbol_data_local.dart';
+// import 'package:flutter_localizations/flutter_localizations.dart';
+// import 'package:flutter/services.dart';
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await DatabaseManagement.instance.database;
+//   await initializeDateFormatting('th', null);
+//   runApp(MyApp());
+// }
+
+// class MyApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       localizationsDelegates: [
+//         GlobalMaterialLocalizations.delegate,
+//         GlobalWidgetsLocalizations.delegate,
+//         GlobalCupertinoLocalizations.delegate,
+//       ],
+//       supportedLocales: [
+//         const Locale('en', ''),
+//         const Locale('th', ''),
+//       ],
+//       locale: const Locale('th', ''),
+//       home: MyHomePage(),
+//     );
+//   }
+// }
+
+// class MyHomePage extends StatefulWidget {
+//   @override
+//   _MyHomePageState createState() => _MyHomePageState();
+// }
+
+// class _MyHomePageState extends State<MyHomePage> {
+//   int _selectedIndex = 0;
+//   bool _isSharedImage = false;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _initializeMethodChannel();
+//   }
+
+//   void _initializeMethodChannel() {
+//     const MethodChannel channel = MethodChannel("vongola");
+//     channel.setMethodCallHandler((call) async {
+//       if (call.method == 'shareImage') {
+//         setState(() {
+//           _isSharedImage = true;
+//         });
+//       }
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     // ถ้ามีการแชร์ภาพ ให้ไปที่หน้า AddTransaction
+//     if (_isSharedImage) {
+//       return AddTransaction(); 
+//     }
+
+//     return Scaffold(
+//       body: _getPage(_selectedIndex),
+//       bottomNavigationBar: BottomNavigationBar(
+//         items: <BottomNavigationBarItem>[
+//           BottomNavigationBarItem(
+//             icon: Image.asset(
+//               _selectedIndex == 0 ? 'assets/home_color.png' : 'assets/home_gray.png',
+//               width: 28,
+//               height: 28,
+//             ),
+//             label: 'Home',
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Image.asset(
+//               _selectedIndex == 1 ? 'assets/dashboard_color.png' : 'assets/dashboard_gray.png',
+//               width: 28,
+//               height: 28,
+//             ),
+//             label: 'Dashboard',
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Image.asset(
+//               _selectedIndex == 2 ? 'assets/wallet_color.png' : 'assets/wallet_gray.png',
+//               width: 28,
+//               height: 28,
+//             ),
+//             label: 'Wallet',
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Image.asset(
+//               _selectedIndex == 3 ? 'assets/budget_color.png' : 'assets/budget_gray.png',
+//               width: 28,
+//               height: 28,
+//             ),
+//             label: 'Budget',
+//           ),
+//         ],
+//         currentIndex: _selectedIndex,
+//         onTap: (index) {
+//           setState(() {
+//             _isSharedImage = false; // รีเซ็ตสถานะเมื่อเปลี่ยนหน้า
+//             _selectedIndex = index;
+//           });
+//         },
+//         selectedItemColor: const Color.fromARGB(255, 50, 50, 50),
+//         unselectedItemColor: Colors.grey[600],
+//         selectedLabelStyle: TextStyle(
+//           fontSize: 12,
+//           fontWeight: FontWeight.bold,
+//         ),
+//       ),
+//     );
+//   }
+
+//   Widget _getPage(int index) {
+//     switch (index) {
+//       case 0:
+//         return Page1();
+//       case 1:
+//         return Page2();
+//       case 2:
+//         return Page3();
+//       case 3:
+//         return Page4();
+//       default:
+//         return Page1();
+//     }
+//   }
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// //------------------------
+// //------------------------
+// import 'package:flutter/material.dart';
+// import 'window/Page1/page1.dart';
+// import 'window/Page1/pageAddLog.dart';
+// import 'window/page2.dart';
+// import 'window/page3.dart';
+// import 'window/Page4/page4.dart';
+// import '../database/db_manage.dart';
+// import 'package:intl/date_symbol_data_local.dart';
+// import 'package:flutter_localizations/flutter_localizations.dart';
+// import 'package:flutter/services.dart'; // เพิ่มการนำเข้า
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await DatabaseManagement.instance.database;
+//   await initializeDateFormatting('th', null);
+
+//   runApp(MyApp());
+// }
+
+// class MyApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       localizationsDelegates: [
+//         GlobalMaterialLocalizations.delegate,
+//         GlobalWidgetsLocalizations.delegate,
+//         GlobalCupertinoLocalizations.delegate,
+//       ],
+//       supportedLocales: [
+//         const Locale('en', ''),
+//         const Locale('th', ''),
+//       ],
+//       locale: const Locale('th', ''),
+//       home: MyHomePage(),
+//     );
+//   }
+// }
+
+// class MyHomePage extends StatefulWidget {
+//   @override
+//   _MyHomePageState createState() => _MyHomePageState();
+// }
+
+// class _MyHomePageState extends State<MyHomePage> {
+//   int _selectedIndex = 0;
+//   bool _isSharedImage = false; // ตัวแปรเพื่อเช็คว่ามีการแชร์ภาพ
+
+//   final List<Widget> _pages = [
+//     Page1(),
+//     Page2(),
+//     Page3(),
+//     Page4(),
+//     AddTransaction(),
+//   ];
+
+//   @override
+//   void initState() {
+//     super.initState();
+
+//     // เพิ่มการตั้งค่าเพื่อรับข้อมูลจากการแชร์
+//     const MethodChannel channel = MethodChannel("vongola");
+//     channel.setMethodCallHandler((call) async {
+//       if (call.method == 'shareImage') {
+//         setState(() {
+//           _isSharedImage = true; // เปลี่ยนสถานะเมื่อมีการแชร์ภาพ
+//         });
+//       }
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     // ตรวจสอบว่ามีการแชร์ภาพหรือไม่
+//     if (_isSharedImage == true) {
+//       return AddTransaction(); // ไปที่หน้า AddTransaction
+//     }
+
+//     return Scaffold(
+//       body: _pages[_selectedIndex],
+//       bottomNavigationBar: BottomNavigationBar(
+//         items: <BottomNavigationBarItem>[
+//           BottomNavigationBarItem(
+//             icon: Image.asset(
+//               _selectedIndex == 0 ? 'assets/home_color.png' : 'assets/home_gray.png',
+//               width: 28,
+//               height: 28,
+//             ),
+//             label: 'Home',
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Image.asset(
+//               _selectedIndex == 1 ? 'assets/dashboard_color.png' : 'assets/dashboard_gray.png',
+//               width: 28,
+//               height: 28,
+//             ),
+//             label: 'Dashboard',
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Image.asset(
+//               _selectedIndex == 2 ? 'assets/wallet_color.png' : 'assets/wallet_gray.png',
+//               width: 28,
+//               height: 28,
+//             ),
+//             label: 'Wallet',
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Image.asset(
+//               _selectedIndex == 3 ? 'assets/budget_color.png' : 'assets/budget_gray.png',
+//               width: 28,
+//               height: 28,
+//             ),
+//             label: 'Budget',
+//           ),
+//         ],
+//         currentIndex: _selectedIndex,
+//         onTap: (index) {
+//           setState(() {
+//             _isSharedImage = false; // รีเซ็ตสถานะเมื่อเปลี่ยนหน้า
+//             _selectedIndex = index;
+//           });
+//         },
+//         selectedItemColor: const Color.fromARGB(255, 50, 50, 50),
+//         unselectedItemColor: Colors.grey[600],
+//         selectedLabelStyle: TextStyle(
+//           fontSize: 12,
+//           fontWeight: FontWeight.bold,
+//         ),
+//       ),
+//     );
+//   }
+// }

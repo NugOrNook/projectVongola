@@ -1,16 +1,22 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import '../../imageOCR/pick_picture.dart';
-import '../../database/db_manage.dart';
+import '../../../imageOCR/pick_picture.dart';
+import '../../../database/db_manage.dart';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:typed_data'; // เพิ่มการนำเข้า Uint8List
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
+
 import 'package:flutter/services.dart';
 
 class AddTransaction extends StatefulWidget {
-  //------------< พอยเพิ่ม >------------------
-  final String? imageUri; 
-  AddTransaction({Key? key, this.imageUri}) : super(key: key);
-  //-----------------------------------------
 
+  const AddTransaction({super.key});
   @override
   _AddTransactionState createState() => _AddTransactionState();
 }
@@ -20,6 +26,7 @@ class _AddTransactionState extends State<AddTransaction> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _memoController = TextEditingController();
   final ImageOcrHelper _imageOcrHelper = ImageOcrHelper();  // สร้างอินสแตนซ์ของ ImageOcrHelper พอย
+
 
   @override
   void dispose() {
@@ -44,32 +51,22 @@ class _AddTransactionState extends State<AddTransaction> {
     if (extractedText != null) {
       setState(() {
         _amountController.text = extractedText; // ตั้งค่าจำนวนเงิน
+        _formKey.currentState?.fields['transactionType']?.didChange('1');
       });
     }
   }
 
-  @override //พอย
-  void initState() {
-    super.initState();
 
-    // ตรวจสอบว่ามีค่า imageUri มั้ย
-    if (widget.imageUri != null && widget.imageUri!.isNotEmpty) {
-      _handleIncomingImage(widget.imageUri!); // เรียกใช้ฟังก์ชันที่จัดการกับภาพที่แชร์
-    }
-
-    // เพิ่มการตั้งค่าที่นี่เพื่อรับข้อมูลจากการแชร์
-    const MethodChannel channel = MethodChannel("vongola");
-    channel.setMethodCallHandler((call) async {
-      if (call.method == 'shareImage') {
-        final String imageUri = call.arguments; // รับค่า imageUri จากการแชร์
-        await _handleIncomingImage(imageUri); // เรียกฟังก์ชันเพื่อจัดการกับภาพที่แชร์
-      }
-    });
-  }
-  //-------------------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
+    final String? _sharingFile = ModalRoute.of(context)!.settings.arguments as String?;
+    if (_sharingFile!=null){
+
+      print("sharefiles"+_sharingFile);
+      _handleIncomingImage(_sharingFile);
+    }
+    print("00000000000000000000000000000000000000000000000000");
     return Scaffold(
       appBar: AppBar(
         title: Text('Expense & Income Log'),
@@ -160,6 +157,7 @@ class _AddTransactionState extends State<AddTransaction> {
                 name: 'amountController',
                 controller: _amountController,
                 decoration: InputDecoration(
+
                   labelText: 'Enter Amount of Money',
                   border: OutlineInputBorder(),
                 ),
@@ -173,6 +171,7 @@ class _AddTransactionState extends State<AddTransaction> {
                   }
                   return null;
                 },
+
               ),
 
               FormBuilderTextField(
