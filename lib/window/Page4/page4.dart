@@ -19,9 +19,8 @@ class _BugetPage extends State<Page4> {
         title: Center(
           child: Text('Budget'),
         ),
-        elevation: 1.0, // เพิ่มเงาใต้ AppBar
-        // shadowColor: Colors.grey.withOpacity(0.5), // กำหนดสีเงา
-        bottom: PreferredSize( // เพิ่มเส้นแบ่งที่ด้านล่างของ AppBar
+        elevation: 1.0, 
+        bottom: PreferredSize(
           preferredSize: Size.fromHeight(1.0),
           child: Container(
             color: const Color.fromARGB(255, 217, 217, 217), // สีเส้นแบ่ง

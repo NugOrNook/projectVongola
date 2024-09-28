@@ -48,8 +48,19 @@ class _Page2State extends State<Page2> {
     'Medical expenses': 'assets/medical.png',
     'Beauty expenses': 'assets/beauty.png',
     'Other': 'assets/other.png',
+    'IC' :'assets/money.png'
 
   };
+
+  String formatCurrency(double value) {
+    if (value >= 1e6) {
+      return '${(value / 1e6).toStringAsFixed(1)}M'; // Format for millions
+    } else if (value >= 1e3) {
+      return '${(value / 1e3).toStringAsFixed(1)}k'; // Format for thousands
+    }
+    return value.toString(); // Return as is for values less than a thousand
+  }
+
 
   @override
   void initState() {
@@ -142,10 +153,10 @@ class _Page2State extends State<Page2> {
 
               SizedBox(height: 20),
               // ส่วนแสดงกราฟ Pie Chart
-              if (selectedIcon == 'Pie') _buildPieChart(),
+              if (selectedIcon == 'Pie') _build_DonutChart(),
               // ส่วนแสดงกราฟ Bar Chart
-              if (selectedIcon == 'Bar') _buildBarChart(),
-              if (selectedIcon == 'Status') _buildStatusList()
+              if (selectedIcon == 'Bar') _build_BarChart(),
+              if (selectedIcon == 'Status') _build_StatusList()
 
             ],
           ),
@@ -225,7 +236,7 @@ class _Page2State extends State<Page2> {
     );
   }
 
-  Widget _buildPieChart() {
+  Widget _build_DonutChart() {
     // ข้อความ Chart และ Show Expenses อยู่ด้านบนก่อน if
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0), // กำหนดระยะห่างจากขอบซ้ายและขวา 20
@@ -291,7 +302,7 @@ class _Page2State extends State<Page2> {
     );
   }
 
-  Widget _buildBarChart() {
+  Widget _build_BarChart() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
@@ -382,30 +393,6 @@ class _Page2State extends State<Page2> {
                           ],
                         ),
                       ],
-                      titlesData: FlTitlesData(
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            getTitlesWidget: (double value, TitleMeta meta) {
-                              return Text(
-                                value.toString(),
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 12,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            getTitlesWidget: (double value, TitleMeta meta) {
-                              return Text(''); // ตั้งค่าชื่อหรือ label แกน X ได้ตามที่คุณต้องการ
-                            },
-                          ),
-                        ),
-                      ),
                     ),
                   ),
                 ),
@@ -417,7 +404,7 @@ class _Page2State extends State<Page2> {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: '- ${totalExpense}฿',
+                            text: '- ${formatCurrency(totalExpense)}฿',
                             style: TextStyle(fontSize: 20, color: Colors.red),
                           ),
                         ],
@@ -427,7 +414,7 @@ class _Page2State extends State<Page2> {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: '+ ${totalIncome}฿',
+                            text: '+ ${formatCurrency(totalIncome)}฿',
                             style: TextStyle(fontSize: 20, color: Colors.green),
                           ),
                         ],
@@ -444,7 +431,8 @@ class _Page2State extends State<Page2> {
 
 
 
-  Widget _buildStatusList() {
+
+  Widget _build_StatusList() {
     double totalIncome_Status = 0;
     double totalExpense_Status = 0;
 
@@ -534,7 +522,7 @@ class _Page2State extends State<Page2> {
                     height: 40,
                     fit: BoxFit.cover,
                   ),
-                  title: Text(type),
+                  title: Text(type == 'IC' ? 'Income' : type), // เพิ่มเงื่อนไขที่นี่
                   trailing: Text(
                     amountText,
                     style: TextStyle(color: amountColor),
@@ -546,6 +534,7 @@ class _Page2State extends State<Page2> {
       ),
     );
   }
+
 
 
   void _showDateDetailsDialog(DateTime date) async {
