@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:vongola/window/Page1/pageAddLog.dart';
 import 'window/Page1/page1.dart';
-import 'window/page2.dart';
-import 'window/page3.dart';
+import 'window/Page1/pageAddLog.dart';
+import 'window/Page2/page2.dart';
+import 'window/Page3/page3.dart';
 import 'window/Page4/page4.dart';
 import '../database/db_manage.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
-import 'package:receive_sharing_intent/receive_sharing_intent.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DatabaseManagement.instance.database;  // Initialize the database
@@ -25,14 +23,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  static const platform = MethodChannel("vongola");
 
   @override
   void initState() {
     super.initState();
-    // Listen to media sharing coming from outside the app while the app is in the memory.
-
-
   }
 
   @override
@@ -53,9 +47,6 @@ class _MyAppState extends State<MyApp> {
         '/':(context) => MyHomePage(),
         '/addTransactionPage':(context) => const AddTransaction(),
         '/Page1':(context) =>  Page1(),
-      },
-      onUnknownRoute: (settings){
-        return MaterialPageRoute(builder: (context)=> Page3());
       },
     );
   }

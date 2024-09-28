@@ -5,9 +5,6 @@ import 'pageAddBudget.dart';
 import 'detailBudget.dart'; // เพิ่ม import สำหรับ detailBudget page
 import '../../database/db_manage.dart'; // เพิ่ม import สำหรับ DatabaseManagement
 import 'budgetCompared.dart';
-import 'package:intl/intl.dart';
-
-//import 'show.dart';
 
 class Page4 extends StatefulWidget {
   @override
@@ -19,9 +16,17 @@ class _BugetPage extends State<Page4> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: EdgeInsets.only(left: 10), // กำหนด padding ซ้าย 20
+        title: Center(
           child: Text('Budget'),
+        ),
+        elevation: 1.0, // เพิ่มเงาใต้ AppBar
+        // shadowColor: Colors.grey.withOpacity(0.5), // กำหนดสีเงา
+        bottom: PreferredSize( // เพิ่มเส้นแบ่งที่ด้านล่างของ AppBar
+          preferredSize: Size.fromHeight(1.0),
+          child: Container(
+            color: const Color.fromARGB(255, 217, 217, 217), // สีเส้นแบ่ง
+            height: 1.0,
+          ),
         ),
       ),
       body: CreateBudget(),
@@ -229,12 +234,20 @@ class _CreateBudgetState extends State<CreateBudget> {
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color.fromARGB(255, 224, 252, 255),
+              color: const Color.fromARGB(255, 240, 224, 253),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2), // สีเงา
+                  offset: Offset(0, 3), // เงาเฉพาะด้านล่าง (แกน y)
+                  blurRadius: 5, // กระจายของเงา
+                  spreadRadius: 1, // ความกว้างของเงา
+                ),
+              ],
             ),
             child: Icon(
               Icons.add_circle_outline,
               size: 30,
-              color: Colors.blue,
+              color: const Color.fromARGB(255, 75, 51, 111),
             ),
           ),
           SizedBox(height: 8),

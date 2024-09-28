@@ -73,10 +73,10 @@ class DatabaseManagement {
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Medical expenses' });
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Beauty expenses' });
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Other' });
+    await db.insert(tableTypeTransaction, { columnTypeTransaction: 'IC' });
 
 
     //----------------------------------{ Mock data }------------------------------------
-    
     // await db.insert(tableBudget, {
     //   columnCapitalBudget: 1000.0,
     //   columnIdTypeTransaction: 1,
@@ -178,6 +178,7 @@ class DatabaseManagement {
   //   db.close();
   // }
   // ------------------------------------------------------
+  
   Future<void> showAllData() async {
     Database db = await instance.database;
 
@@ -261,5 +262,10 @@ class DatabaseManagement {
     } else {
       return null; // ถ้าไม่พบข้อมูล
     }
+  }
+  
+  Future<List<Map<String, dynamic>>> rawQuery(String query, [List<Object>? arguments]) async {
+    final db = await instance.database;
+    return await db.rawQuery(query, arguments);
   }
 }

@@ -46,6 +46,10 @@ dependencies:
   google_ml_kit: ^0.18.0
   carousel_slider: ^5.0.0
   receive_sharing_intent: ^1.8.0
+  fl_chart: ^0.69.0
+  table_calendar: ^3.1.2
+  google_fonts: ^6.2.1
+  
 
 dev_dependencies:
   flutter_test:
@@ -86,6 +90,13 @@ flutter:
 
     - assets/warning_1.png
     - assets/warning_2.png
+
+    - assets/Zzz.png
+    - assets/money.png
+
+    - assets/pie-chart.png
+    - assets/notes.png
+    - assets/compare.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

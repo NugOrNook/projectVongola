@@ -62,16 +62,32 @@ class _DetailBudget extends State<DetailBudget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Budget Detail'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+        title: Text(_isEditing ? 'Edit Budget' : 'Budget Detail'),
+          centerTitle: true, // จัด title ให้อยู่ตรงกลาง
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              if (_isEditing) {
+                setState(() {
+                  _isEditing = false; // กลับไปหน้า Budget Detail
+                });
+              } else {
+                Navigator.pop(context); // ถ้าไม่ได้อยู่ในโหมดแก้ไข ก็ย้อนกลับไปหน้าก่อนหน้า
+              }
+            },
+          ),
+        elevation: 1.0, // เพิ่มเงาใต้ AppBar
+        bottom: PreferredSize( // เพิ่มเส้นแบ่งที่ด้านล่างของ AppBar
+          preferredSize: Size.fromHeight(1.0),
+          child: Container(
+            color: const Color.fromARGB(255, 217, 217, 217), // สีเส้นแบ่ง
+            height: 1.0,
+          ),
         ),
       ),
+
       body: Padding(
-        padding: const EdgeInsets.only(bottom: 16, left: 20, right: 20),
+        padding: const EdgeInsets.only(bottom: 16, left: 20, right: 20, top: 20),
         child: Container(
           margin: const EdgeInsets.only(bottom: 16.0),
           padding: const EdgeInsets.all(16.0),
@@ -82,9 +98,17 @@ class _DetailBudget extends State<DetailBudget> {
               color: const Color.fromARGB(255, 217, 217, 217),
               width: 1,
             ),
+            boxShadow: [
+                  BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                spreadRadius: 2,
+                blurRadius: 5,
+              ),
+            ],
           ),
           child: Column(
             children: [
+              SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(
@@ -132,7 +156,8 @@ class _DetailBudget extends State<DetailBudget> {
               String StartDate = DateFormat('yyyy-MM-dd').format(DateTime.parse(budget['date_start']));
               String EndDate = DateFormat('yyyy-MM-dd').format(DateTime.parse(budget['date_end']));
 
-              return GestureDetector(
+              return Padding(
+                padding: EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -162,7 +187,7 @@ class _DetailBudget extends State<DetailBudget> {
                     Row(
                       children: [
                         Expanded(
-                          child: TextButton(
+                          child: ElevatedButton(
                             onPressed: () {
                               setState(() {
                                 _idBudget = budget['ID_budget'];
@@ -173,6 +198,15 @@ class _DetailBudget extends State<DetailBudget> {
                               });
                             },
                             child: Text('Edit'),
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 10), // Same padding as Save button
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30), // Match Save button's rounded corners
+                              ),
+                              backgroundColor: Color.fromARGB(255, 243, 240, 251), // Same background color as Save button
+                              elevation: 1, // Increase elevation to match the Save button's shadow
+                              shadowColor: Colors.black.withOpacity(1.0), // Subtle shadow for the bottom
+                            ),
                           ),
                         ),
                       ],

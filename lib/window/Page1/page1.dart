@@ -22,30 +22,13 @@ class _Introduction extends State<Page1> {
     _transactionsFuture = DatabaseManagement.instance.queryAllTransactions();
     _intentSub = ReceiveSharingIntent.instance.getMediaStream().listen((value) {
         setState(() {
-       // _sharedFiles.clear();
-        print("***************************144*****144");
-       // _sharedFiles.addAll(value);
-
-        List<SharedMediaFile> sharedFile = value;
-        print(sharedFile[0].path);
-        Navigator.pushNamed(context, '/addTransactionPage',arguments: sharedFile[0].path);
-
-        print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
-
+          List<SharedMediaFile> sharedFile = value;
+          print(sharedFile[0].path);
+          Navigator.pushNamed(context, '/addTransactionPage',arguments: sharedFile[0].path);
         });
       }, onError: (err) {
         print("getIntentDataStream error: $err");
       });
-    // Get the media sharing coming from outside the app while the app is closed.
-    // ReceiveSharingIntent.instance.getInitialMedia().then((value) {
-    //   setState(() {
-    //     print("***************************155555555555555*****15555555555555555");
-    //
-    //     Navigator.pushNamed(context, 'addTransactionPage');
-    //     // Tell the library that we are done processing the intent.
-    //     ReceiveSharingIntent.instance.reset();
-    //   });
-    // });
   }
 
   void _refreshTransactions() {
@@ -62,12 +45,12 @@ class _Introduction extends State<Page1> {
   
   @override
   Widget build(BuildContext context) => Scaffold(
-    body: Column(
-      crossAxisAlignment: CrossAxisAlignment.start, // จัดตำแหน่ง widgets ให้อยู่ที่ด้านซ้าย
+    body: ListView(
+      //crossAxisAlignment: CrossAxisAlignment.start, // จัดตำแหน่ง widgets ให้อยู่ที่ด้านซ้าย
       children: <Widget>[
         // Text Introduction
         Container(
-          padding: EdgeInsets.fromLTRB(20, 80, 15, 0), // จัดตำแหน่ง ซ้าย บน ขวา ล่าง
+          padding: EdgeInsets.fromLTRB(20, 50, 15, 0), // จัดตำแหน่ง ซ้าย บน ขวา ล่าง
           child: Text(
             'Hello, Friend!',
             style: TextStyle(
@@ -78,11 +61,7 @@ class _Introduction extends State<Page1> {
           ),
         ),
         Container(
-          padding: EdgeInsets.only(
-            top: 0,   // ระยะห่างด้านบน
-            bottom: 0, // ระยะห่างด้านล่าง
-            left: 20
-          ),
+          padding: EdgeInsets.only(top: 0, bottom: 0, left: 20 ),
           child: Text(
             "Let's start accounting for expenses",
             style: TextStyle(
@@ -113,34 +92,41 @@ class _Introduction extends State<Page1> {
             ),
           ),
         ),
+        SizedBox(height: 25,),
 
-        Expanded(
+        Container(
+          height: 250, // กำหนดขนาดที่แน่นอน
           child: CardFinancial(
             transactionsFuture: _transactionsFuture,
-          ), // ส่ง Future ให้กับ CardFinancial
+          ),
         ),
 
-        // Card 
-        // Column(
-        //   mainAxisAlignment: MainAxisAlignment.center,
-        //   children: [
-        //     Container(
-        //       padding: EdgeInsets.symmetric(vertical: 20.0), // ระยะห่างบนและล่างของ Card
-        //       child: CardFinancial(transactionsFuture: _transactionsFuture),
-        //     )
-        //   ]
-        // ), 
+        // Container(
+        //   padding: EdgeInsets.fromLTRB(20, 40, 15, 0),
+        //   child: Text(
+        //     "Budget in each category",
+        //     style: TextStyle(
+        //       fontSize: 18,
+        //       color: Colors.black,
+        //     ),
+        //   ),
+        // ),
+        // SizedBox(height: 15,),
       ],
     ),
 
         //ปุ่มไปยังหน้าบันทึกรายรายจ่าย
     floatingActionButton: FloatingActionButton(
       onPressed: () async {
-        await Navigator.push(
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => AddTransaction()),
         );
-        _refreshTransactions(); // รีเฟรชข้อมูลเมื่อกลับมาจากหน้า AddTransaction
+        
+        // ตรวจสอบผลลัพธ์ที่ส่งกลับมา ถ้าเป็น true ให้รีเฟรชข้อมูล
+        if (result == true) {
+          _refreshTransactions(); // รีเฟรชข้อมูลใหม่ทันทีหลังจากเพิ่มข้อมูลใหม่
+        }
       },
       child: const Icon(Icons.add, size: 25,),
     ),

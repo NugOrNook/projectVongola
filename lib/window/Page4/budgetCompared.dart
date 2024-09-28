@@ -44,7 +44,6 @@ class _BudgetComparedListState extends State<BudgetComparedList> {
   Future<List<Map<String, dynamic>>> fetchBudgetData() async {
     final db = DatabaseManagement.instance;
     final now = DateTime.now();
-    final formattedNow = DateFormat('yyyy-MM-dd').format(now);
 
     // ดึง budget ที่วันปัจจุบันยังไม่เกิน columnDateEnd
     final budgets = await db.queryAllBudgets();
