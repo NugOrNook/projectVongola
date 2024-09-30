@@ -19,8 +19,8 @@ class _Page2State extends State<Page2> {
   List<Map<String, dynamic>> statusExpenses = [];
   List<Map<String, dynamic>> selectedDateExpenses = [];
   DateTime? selectedDate;
-
-
+  Set<DateTime> markedDates = {};
+  DateTime? currentSelectedDate; // ประกาศตัวแปรเก็บวันที่เลือก
 
   final Map<String, Color> typeToColor = {
     'Food': Colors.red,
@@ -34,9 +34,8 @@ class _Page2State extends State<Page2> {
     'Beauty expenses': Colors.pinkAccent,
     'Cost of equipment': Colors.blue.shade100,
     'Other': Colors.teal.shade400,
-
-
   };
+
   final Map<String, String> typeImage = {
     'Food': 'assets/food.png',
     'Travel expenses':'assets/travel_expenses.png',
@@ -49,7 +48,6 @@ class _Page2State extends State<Page2> {
     'Beauty expenses': 'assets/beauty.png',
     'Other': 'assets/other.png',
     'IC' :'assets/money.png'
-
   };
 
   String formatCurrency(double value) {
@@ -61,7 +59,6 @@ class _Page2State extends State<Page2> {
     return value.toString(); // Return as is for values less than a thousand
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -69,73 +66,158 @@ class _Page2State extends State<Page2> {
     selectedIcon = 'Pie'; // เริ่มต้นที่ Pie Chart
     _show_DonutChart(context); // เรียกใช้ Pie Chart สำหรับ Day
      // เรียก Status สำหรับ Day
+    _fetch_Mark_Dates();
   }
 
+  Future<void> _fetch_Mark_Dates() async {
+    // ดึงข้อมูลวันที่ที่มีการบันทึกจากฐานข้อมูล
+    final List<Map<String, dynamic>> result = await DatabaseManagement.instance.rawQuery(
+        '''
+      SELECT DISTINCT DATE(date_user) as date_user 
+      FROM Transactions
+      '''
+    );
+
+    setState(() {
+      markedDates = result.map((data) => DateTime.parse(data['date_user'])).toSet();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(title: Text('Static Chart')),
+      appBar: AppBar(
+        title: Center(
+          child: Text('Dashboard'),
+        ),
+        elevation: 1.0,
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(1.0),
+          child: Container(
+            color: const Color.fromARGB(255, 217, 217, 217),
+            height: 1.0,
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
             children: [
-              // ส่วนการแสดงปฏิทินและไอคอน
+              SizedBox(height: 5),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0), // เพิ่ม Padding ซ้ายและขวา
                 child: TableCalendar(
                   firstDay: DateTime.utc(2023, 1, 1),
                   lastDay: DateTime.utc(2100, 1, 1),
                   focusedDay: DateTime.now(),
-                    availableCalendarFormats: const {
-                      CalendarFormat.month : 'Month'
-                    },
+                  availableCalendarFormats: const {
+                    CalendarFormat.month: 'Month'
+                  },
                   selectedDayPredicate: (day) => isSameDay(selectedDate, day),
                   onDaySelected: (selectedDay, focusedDay) {
                     setState(() {
                       selectedDate = selectedDay;
-                      print(selectedDay);
+
                       DateTime dateOnly = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
-                      print("Selected date: $dateOnly");
+
                       _showDateDetailsDialog(dateOnly);
                     });
                   },
+                  // ใช้ CalendarBuilders ในการกำหนดวันที่มีการบันทึก
+                  calendarBuilders: CalendarBuilders(
+                    markerBuilder: (context, date, events) {
+                      // ตรวจสอบวันที่มีข้อมูลใน markedDates
+                      if (markedDates.any((markedDate) =>
+                          markedDate.year == date.year &&
+                          markedDate.month == date.month &&
+                          markedDate.day == date.day)) {
+
+                        return Positioned(
+                          bottom: 1,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color.fromARGB(255, 91, 92, 91),
+                            ),
+                          ),
+                        );
+                      }
+                      return null; // ถ้าไม่มีข้อมูลในวันนั้น ไม่แสดงสัญลักษณ์
+                    },
+                  ),
+                  headerStyle: HeaderStyle(
+                    formatButtonVisible: false,
+                    titleCentered: true, // ทำให้ชื่อเดือนปีอยู่ตรงกลาง
+                    titleTextStyle: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  calendarStyle: CalendarStyle(
+                    todayDecoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 90, 216, 255),
+                      shape: BoxShape.circle,
+                    ),
+                    selectedDecoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 255, 137, 176),
+                      shape: BoxShape.circle,
+                    ),
+                    defaultTextStyle: TextStyle(
+                      fontSize: 15.0,
+                    ),
+                    weekendTextStyle: TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.red,
+                    ),
+                  ),
+                  daysOfWeekStyle: DaysOfWeekStyle(          
+                    weekdayStyle: TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    weekendStyle: TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
               ),
               SizedBox(height: 20),
 
-
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                padding: const EdgeInsets.only(left: 35, right: 35, top: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     _buildIconButton(
-                      Image.asset('assets/pie-chart.png', width: 70, height: 70), // ใช้รูปภาพจาก assets
-                      'Pie',
-                      Colors.blue,
+                      Image.asset('assets/pie-chart.png', width: 45, height: 45), // ใช้รูปภาพจาก assets
+                      'CHART',
+                      const Color.fromARGB(255, 104, 255, 247),
                       _show_DonutChart,
                     ),
                     _buildIconButton(
-                      Image.asset('assets/notes.png', width: 70, height: 70), // ใช้รูปภาพจาก assets
-                      'Status',
-                      Colors.green,
+                      Image.asset('assets/notes.png', width: 45, height: 45), // ใช้รูปภาพจาก assets
+                      'RECORD',
+                      const Color.fromARGB(255, 142, 255, 134),
                       _show_Status_Expense,
                     ),
                     _buildIconButton(
-                      Image.asset('assets/compare.png', width: 70, height: 70), // ใช้รูปภาพจาก assets
-                      'Bar',
-                      Colors.orange,
+                      Image.asset('assets/compare.png', width: 45, height: 45), // ใช้รูปภาพจาก assets
+                      'COMPARE',
+                      const Color.fromARGB(255, 255, 188, 88),
                       _show_BarChart,
                     ),
                   ],
                 ),
               ),
-
-
               SizedBox(height: 20),
-              // ปุ่ม Day, Month, Year
+              
+              
               Padding(
                 padding: const EdgeInsets.only(right: 20.0), // กำหนดให้ห่างจากขอบขวา 20
                 child: Row(
@@ -153,41 +235,14 @@ class _Page2State extends State<Page2> {
 
               SizedBox(height: 20),
               // ส่วนแสดงกราฟ Pie Chart
-              if (selectedIcon == 'Pie') _build_DonutChart(),
+              if (selectedIcon == 'CHART') _build_DonutChart(),
               // ส่วนแสดงกราฟ Bar Chart
-              if (selectedIcon == 'Bar') _build_BarChart(),
-              if (selectedIcon == 'Status') _build_StatusList()
-
+              if (selectedIcon == 'RECORD') _build_BarChart(),
+              if (selectedIcon == 'COMPARE') _build_StatusList()
             ],
           ),
         ),
       ),
-    );
-  }
-
-  // สร้างปุ่มเลือกช่วงเวลา (Day, Month, Year)
-  TextButton _buildPeriodButton(String label) {
-    return TextButton(
-      onPressed: () {
-        setState(() {
-          selectedButton = label;
-        });
-        if (selectedIcon == 'Pie') {
-          _show_DonutChart(context); // เรียกฟังก์ชันดึงข้อมูล Pie Chart เมื่อเลือกช่วงเวลา
-        } else if (selectedIcon == 'Bar') {
-          _show_BarChart(context); // เรียกฟังก์ชันดึงข้อมูล Bar Chart เมื่อเลือกช่วงเวลา
-        }else if(selectedIcon=='Status'){
-          _show_Status_Expense(context);
-        }
-      },
-      child: Text(
-          label,
-          style: TextStyle(
-          color:selectedButton==label ? Colors.blue : Colors.black, // เปลี่ยนสีตัวอักษรเมื่อถูกเลือก
-        fontWeight: selectedButton == label ? FontWeight.bold : FontWeight.normal, // เพิ่มความหนาของตัวอักษรเมื่อถูกเลือก
-      ),
-    ),
-
     );
   }
 
@@ -200,13 +255,29 @@ class _Page2State extends State<Page2> {
         onPressed(context);
       },
       child: Container(
+        width: 85, // กำหนดความกว้างที่แน่นอน
+        height: 100, // กำหนดความสูงที่แน่นอน
         decoration: BoxDecoration(
           color: selectedIcon == iconType ? color.withOpacity(0.2) : Colors.transparent,
           border: Border.all(color: Colors.black26, width: 1.5),
           borderRadius: BorderRadius.circular(10),
         ),
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // เพิ่ม padding ซ้ายและขวา
-        child: iconWidget,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center, // จัดกลางในแนวตั้ง
+          mainAxisSize: MainAxisSize.min, // ป้องกันไม่ให้ Column ยืดตัวเกินไป
+          children: [
+            Text(
+              iconType, // ข้อความที่แสดงเหนือรูปภาพ
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.center, // จัดกลางข้อความ
+            ),
+            SizedBox(height: 8), // ช่องว่างระหว่างข้อความและรูปภาพ
+            iconWidget, // รูปภาพที่ส่งเข้ามา
+          ],
+        ),
       ),
     );
   }
@@ -227,7 +298,7 @@ class _Page2State extends State<Page2> {
             ),
             SizedBox(width: 8),
             Text(
-              '${section.title.split('\n')[0]}: ${section.value.toStringAsFixed(2)}', // แสดงชื่อและมูลค่า
+              '${section.title.split('\n')[0]}: ${formatCurrency(section.value)}', // แสดงชื่อและมูลค่า
               style: TextStyle(fontSize: 16),
             ),
           ],
@@ -429,9 +500,6 @@ class _Page2State extends State<Page2> {
     );
   }
 
-
-
-
   Widget _build_StatusList() {
     double totalIncome_Status = 0;
     double totalExpense_Status = 0;
@@ -475,14 +543,16 @@ class _Page2State extends State<Page2> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Income', style: TextStyle(color: Colors.green)),
-              Text('${totalIncome_Status.toStringAsFixed(2)} THB', style: TextStyle(color: Colors.green)),
+              Text('${formatCurrency(totalIncome_Status)} THB', style: TextStyle(color: Colors.green)),
             ],
+
+
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Expenses', style: TextStyle(color: Colors.red)),
-              Text('${totalExpense_Status.toStringAsFixed(2)} THB', style: TextStyle(color: Colors.red)),
+              Text('${formatCurrency(totalExpense_Status)} THB', style: TextStyle(color: Colors.red)),
             ],
           ),
           SizedBox(height: 50),
@@ -510,7 +580,7 @@ class _Page2State extends State<Page2> {
                 final transaction = statusExpenses[index];
                 final type = transaction['type'];
                 final imagePath = typeImage[type] ?? 'assets/other.png';
-                final amount = transaction['amount'];
+                final amount = formatCurrency(transaction['amount']);
                 final isExpense = transaction['isExpense'];
                 final amountText = isExpense ? '-$amount THB' : '+$amount THB';
                 final amountColor = isExpense ? Colors.red : Colors.green;
@@ -535,86 +605,161 @@ class _Page2State extends State<Page2> {
     );
   }
 
+  // สร้างปุ่มเลือกช่วงเวลา (Day, Month, Year)
+  TextButton _buildPeriodButton(String label) {
+    return TextButton(
+      onPressed: () {
+        setState(() {
+          selectedButton = label;
+        });
+        if (selectedIcon == 'CHART') {
+          _show_DonutChart(context); // เรียกฟังก์ชันดึงข้อมูล Pie Chart เมื่อเลือกช่วงเวลา
+        } else if (selectedIcon == 'RECORD') {
+          _show_BarChart(context); // เรียกฟังก์ชันดึงข้อมูล Bar Chart เมื่อเลือกช่วงเวลา
+        }else if(selectedIcon=='COMPARE'){
+          _show_Status_Expense(context);
+        }
+      },
+      child: Text(
+        label,
+        style: TextStyle(
+          color:selectedButton==label ? Colors.blue : Colors.black, // เปลี่ยนสีตัวอักษรเมื่อถูกเลือก
+          fontWeight: selectedButton == label ? FontWeight.bold : FontWeight.normal, // เพิ่มความหนาของตัวอักษรเมื่อถูกเลือก
+        ),
+      ),
+
+    );
+  }
+
+  Future<void> _deleteExpense(int id) async {
+    int deletedCount = await DatabaseManagement.instance.deleteTransaction(id);
+
+    if (deletedCount > 0) {
+      print('Deleted successfully!');
+
+      // อัปเดตลิสต์ selectedDateExpenses
+      setState(() {
+        selectedDateExpenses.removeWhere((expense) => expense['ID'] == id);
+      });
+      await _fetch_Mark_Dates();
+
+      // ปิด dialog
+      Navigator.of(context).pop();
+
+      // เปิด dialog ใหม่พร้อมข้อมูลที่อัปเดตแล้ว
+      _showDateDetailsDialog(currentSelectedDate!);
+    } else {
+      print('No data deleted.');
+    }
+
+    print('Attempting to delete ID---------------: $id');
+    print(deletedCount);
+  }
+
+
 
 
   void _showDateDetailsDialog(DateTime date) async {
+    currentSelectedDate = date;
     String dateString = date.toIso8601String().split('T')[0];
 
-    // ดึงข้อมูลตามวันที่เลือก
-    await _fetchcalendarDay(dateString);
 
+    await _fetchcalendarDay(dateString);
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final screenHeight = MediaQuery.of(context).size.height; // เอาความสูงของหน้าจอมาใช้
         return AlertDialog(
-          title: Text(DateFormat('dd MMM yyyy').format(date.toLocal())), // แปลงวันที่ที่แสดง
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (selectedDateExpenses.isEmpty)
-                  Image.asset(
-                    'assets/Zzz.png',
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.cover,
-                  )
-                else
-                  ...selectedDateExpenses.map((expense) {
-                    String imagetype = 'assets/beauty.png';
-
-                    // เลือกภาพที่เหมาะสมตามประเภท
-                    if (expense['incomeexpense'] == 0) {
-                      imagetype = 'assets/wallet_color.png'; // สำหรับ income
-                    } else if (expense['type'] == 'Food' && expense['incomeexpense'] == 1) {
-                      imagetype = 'assets/food.png'; // สำหรับ expense ประเภท Food
-                    } else if (expense['type'] == 'Travel expenses' && expense['incomeexpense'] == 1) {
-                      imagetype = 'assets/travel_expenses.png';
-                    } else if (expense['type'] == 'Water bill' && expense['incomeexpense'] == 1) {
-                      imagetype = 'assets/water.png';
-                    } else if (expense['type'] == 'Electricity bill' && expense['incomeexpense'] == 1) {
-                      imagetype = 'assets/electricity_bill.png';
-                    } else if (expense['type'] == 'House cost' && expense['incomeexpense'] == 1) {
-                      imagetype = 'assets/house.png';
-                    } else if (expense['type'] == 'Car fare' && expense['incomeexpense'] == 1) {
-                      imagetype = 'assets/car.png';
-                    } else if (expense['type'] == 'Gasoline cost' && expense['incomeexpense'] == 1) {
-                      imagetype = 'assets/gasoline_cost.png';
-                    } else if (expense['type'] == 'Medical expenses' && expense['incomeexpense'] == 1) {
-                      imagetype = 'assets/medical.png';
-                    }
-
-                    return Row(
+          title: Text(DateFormat('dd MMM yyyy').format(date.toLocal())),
+          content: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: screenHeight * 0.7, // จำกัดความสูงของ Dialog ไม่เกิน 70% ของหน้าจอ
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (selectedDateExpenses.isEmpty)
+                    Column(
                       children: [
-                        // รูปภาพทางซ้าย
                         Image.asset(
-                          imagetype,
-                          height: 50,
-                          width: 50,
+                          'assets/Zzz.png',
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
                         ),
-                        SizedBox(width: 10), // ระยะห่างระหว่างรูปกับข้อมูล
+                        Text('No records for this day', style: TextStyle(fontSize: 16)),
+                      ],
+                    )
+                  else
+                    ...selectedDateExpenses.map((expense) {
+                      String imagetype = 'assets/beauty.png';
 
-                        // ข้อมูลทางขวา
-                        Expanded(
-                          child: ListTile(
-                            title: Text(
-                              expense['incomeexpense'].toString() == '0'
-                                  ? 'Income' // ถ้า incomeexpense เป็น 0 จะแสดง "Income"
-                                  : '${expense['type']}', // ถ้าเป็น 1 จะแสดง type ปกติ
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Amount: ${expense['amount']}'),
-                                Text('Memo: ${expense['memo']}'),
-                              ],
+                      // เลือกภาพที่เหมาะสมตามประเภท
+                      if (expense['incomeexpense'] == 0) {
+                        imagetype = 'assets/wallet_color.png'; // สำหรับ income
+                      } else if (expense['type'] == 'Food' && expense['incomeexpense'] == 1) {
+                        imagetype = 'assets/food.png'; // สำหรับ expense ประเภท Food
+                      } else if (expense['type'] == 'Travel expenses' && expense['incomeexpense'] == 1) {
+                        imagetype = 'assets/travel_expenses.png';
+                      } else if (expense['type'] == 'Water bill' && expense['incomeexpense'] == 1) {
+                        imagetype = 'assets/water_bill.png';
+                      } else if (expense['type'] == 'Electricity bill' && expense['incomeexpense'] == 1) {
+                        imagetype = 'assets/electricity_bill.png';
+                      } else if (expense['type'] == 'House cost' && expense['incomeexpense'] == 1) {
+                        imagetype = 'assets/house.png';
+                      } else if (expense['type'] == 'Car fare' && expense['incomeexpense'] == 1) {
+                        imagetype = 'assets/car.png';
+                      } else if (expense['type'] == 'Gasoline cost' && expense['incomeexpense'] == 1) {
+                        imagetype = 'assets/gasoline_cost.png';
+                      } else if (expense['type'] == 'Medical expenses' && expense['incomeexpense'] == 1) {
+                        imagetype = 'assets/medical.png';
+                      }
+
+                      return Row(
+                        children: [
+                          Image.asset(
+                            imagetype,
+                            height: 50,
+                            width: 50,
+                          ),
+                          SizedBox(width: 10), // ระยะห่างระหว่างรูปกับข้อมูล
+
+                          Expanded(
+                            child: ListTile(
+                              title: Text(
+                                expense['incomeexpense'].toString() == '0'
+                                    ? 'Income' // ถ้า incomeexpense เป็น 0 จะแสดง "Income"
+                                    : '${expense['type']}', // ถ้าเป็น 1 จะแสดง type ปกติ
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Amount: ${formatCurrency(expense['amount'])}'),
+                                  Text('Memo: ${expense['memo']}'),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  }).toList(),
-              ],
+                          IconButton(
+                            icon: Icon(Icons.edit_note, color: Colors.blue),
+                            onPressed: () {
+                              _showEditExpenseDialog(expense['ID_transaction_Primary'], (amount, memo) {
+                                // การดำเนินการหลังจากบันทึก
+                                _updateExpense(expense['ID_transaction_Primary'], amount, memo);
+                              });},
+                          ),
+                          IconButton(
+                              icon: Icon(Icons.close_rounded, color: Colors.red),
+                              onPressed: () {
+                              _deleteExpense(expense['ID_transaction_Primary']);
+                              },
+                          ),
+                        ],
+                      );
+                    }).toList(),
+                ],
+              ),
             ),
           ),
           actions: [
@@ -632,12 +777,98 @@ class _Page2State extends State<Page2> {
 
 
 
+  void _showEditExpenseDialog(int id, Function(double, String) onSave) {
+    TextEditingController amountController = TextEditingController();
+    TextEditingController memoController = TextEditingController();
+
+    // ดึงข้อมูลปัจจุบันเพื่อแสดงใน Dialog
+    var expense = selectedDateExpenses.firstWhere((expense) => expense['ID_transaction_Primary'] == id);
+    amountController.text = expense['amount'].toString();
+    memoController.text = expense['memo'].toString();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Edit Expense'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: amountController,
+                decoration: InputDecoration(labelText: 'Amount'),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: memoController,
+                decoration: InputDecoration(labelText: 'Memo'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // ปิด Dialog โดยไม่แก้ไขอะไร
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // อัพเดตข้อมูล expense ในฐานข้อมูล
+                onSave(double.parse(amountController.text), memoController.text); // เรียก onSave เพื่อส่งค่ากลับ
+                Navigator.of(context).pop(); // ปิด Dialog หลังแก้ไขข้อมูลเสร็จ
+                // เปิด dialog ใหม่เพื่อแสดงข้อมูลอัพเดต
+                Future.delayed(Duration(milliseconds: 100), () {
+                  _showDateDetailsDialog(currentSelectedDate!);
+                  Navigator.of(context).pop();
+                });
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  Future<void> _updateExpense(int id, double amount, String memo) async {
+    Map<String, dynamic> updatedRow = {
+      'ID_transaction': id, // ID ของการทำธุรกรรม
+      'amount_transaction': amount, // จำนวนเงินใหม่
+      'memo_transaction': memo, // หมายเหตุใหม่
+    };
+
+    await DatabaseManagement.instance.updateTransaction(updatedRow); // เรียกใช้งานอัปเดตด้วย Map
+    setState(() {
+      // อัปเดตข้อมูลในแอพ
+      selectedDateExpenses = selectedDateExpenses.map((expense) {
+        if (expense['ID_transaction_Primary'] == id) { // ใช้ ID_transaction_Primary แทน
+          return {
+            ...expense,
+            'amount': amount,
+            'memo': memo,
+          };
+        }
+        return expense;
+      }).toList();
+
+    });
+    await _fetch_Mark_Dates();
+    await _fetch_DonutChart_Day();
+    await _fetch_DonutChart_Month();
+    await _fetch_DonutChart_Year();
+    await _fetch_BarChart_Day();
+    await _fetch_BarChart_Month();
+    await _fetch_BarChart_Year();
+    await _fetch_Status_Day();
+    await _fetch_Status_Month();
+    await _fetch_Status_Year();
+  }
 
 
   Future<void> _fetchcalendarDay(String date) async {
     print("Fetching data for date: $date");
-
-    // สร้างวันที่เริ่มต้นและสิ้นสุดสำหรับการค้นหา
     DateTime startDate = DateTime.parse(date);
     print('startDate');
     print(startDate);
@@ -647,18 +878,16 @@ class _Page2State extends State<Page2> {
     final List<Map<String, dynamic>> result = await DatabaseManagement.instance.rawQuery(
       '''
     SELECT *
-
       FROM Transactions
       JOIN Type_transaction ON Transactions.ID_type_transaction = Type_transaction.ID_type_transaction
       WHERE DATE(Transactions.date_user) = '${startDate.year}-${startDate.month.toString().padLeft(2,'0')}-${startDate.day.toString().padLeft(2,'0')}'
-
       ''',
     );
     print("__________________");
     print('${startDate.year}-${startDate.month}-${startDate.day}' );
-    print(result); // ตรวจสอบผลลัพธ์ของการคิวรี
-
-    // อัพเดท UI
+    print("__________________");
+    print("________result__________");
+    print(result);
     setState(() {
       selectedDateExpenses = result.map((data) {
         return {
@@ -667,6 +896,7 @@ class _Page2State extends State<Page2> {
           'memo': data['memo_transaction'] ?? '-',
           'ID':data['ID_type_transaction'] ?? '-',
           'incomeexpense':data['type_expense'] ?? '-',
+          'ID_transaction_Primary':data['ID_transaction']?? '-',
         };
       }).toList();
     });
@@ -681,7 +911,7 @@ class _Page2State extends State<Page2> {
     FROM Transactions
     JOIN Type_transaction ON Transactions.ID_type_transaction = Type_transaction.ID_type_transaction
     WHERE Transactions.type_expense = 1
-    AND DATE(Transactions.date_user) = DATE("now","localtime")  -- เปลี่ยนเป็นกรองตามวันปัจจุบัน
+    AND DATE(Transactions.date_user) = DATE("now","localtime")  
     GROUP BY Transactions.ID_type_transaction
     '''
     );
@@ -691,7 +921,7 @@ class _Page2State extends State<Page2> {
     // }
     //print(total);
     print(result.isEmpty);
-    print('Result from database day: $result'); // ตรวจสอบผลลัพธ์ที่ได้
+    print('Result from database day(donut): $result'); // ตรวจสอบผลลัพธ์ที่ได้
     setState(() {
       pieChartSections = result.map((data) {
         final color = typeToColor[data['type_transaction']] ?? Colors.grey;
@@ -787,7 +1017,7 @@ class _Page2State extends State<Page2> {
            Transactions.type_expense, Type_transaction.type_transaction
     FROM Transactions
     JOIN Type_transaction ON Transactions.ID_type_transaction = Type_transaction.ID_type_transaction
-    WHERE strftime('%Y-%m', Transactions.date_user) = strftime('%Y-%m', 'now','localtime')  -- ดึงข้อมูลตามเดือนปัจจุบัน
+    WHERE strftime('%Y-%m', Transactions.date_user) = strftime('%Y-%m', 'now','localtime')  
     GROUP BY Transactions.ID_type_transaction, Transactions.type_expense
     '''
     );
@@ -813,7 +1043,7 @@ class _Page2State extends State<Page2> {
            Transactions.type_expense, Type_transaction.type_transaction
     FROM Transactions
     JOIN Type_transaction ON Transactions.ID_type_transaction = Type_transaction.ID_type_transaction
-    WHERE strftime('%Y', Transactions.date_user) = strftime('%Y', 'now','localtime')  -- ดึงข้อมูลตามปีปัจจุบัน
+    WHERE strftime('%Y', Transactions.date_user) = strftime('%Y', 'now','localtime') 
     GROUP BY Transactions.ID_type_transaction, Transactions.type_expense
     '''
     );
