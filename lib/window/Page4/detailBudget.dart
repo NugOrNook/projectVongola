@@ -124,7 +124,7 @@ class _DetailBudget extends State<DetailBudget> {
 
               // กำหนดขนาดให้ ListView เพื่อไม่ให้ขยับ
               SizedBox(
-                height: 300, // ระบุขนาดคงที่ให้กับ ListView
+                height: 293, // ระบุขนาดคงที่ให้กับ ListView
                 child: _isEditing ? _buildEditForm(_idBudget!) : _buildBudgetList(),
               ),
             ],

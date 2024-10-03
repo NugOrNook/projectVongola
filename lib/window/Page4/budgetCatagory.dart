@@ -38,7 +38,7 @@ class _Budgetcatagory extends State<Budgetcatagory> {
                 _buildBudgetItem('assets/gasoline_cost.png', "Gasoline cost", '7'),
                 _buildBudgetItem('assets/medical.png', "Medical", '8'),
                 _buildBudgetItem('assets/beauty.png', "Beauty", '9'),
-                _buildBudgetItem('assets/Other.png', "Other", '10'),
+                _buildBudgetItem('assets/other.png', "Other", '10'),
               ],
             ),
           ),

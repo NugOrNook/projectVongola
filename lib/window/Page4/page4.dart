@@ -87,7 +87,7 @@ class _CreateBudgetState extends State<CreateBudget> {
                     _buildCategoryItem(context, 'assets/gasoline_cost.png', "Gasoline", '7'),
                     _buildCategoryItem(context, 'assets/medical.png', "Medical", '8'),
                     _buildCategoryItem(context, 'assets/beauty.png', "Beauty", '9'),
-                    _buildCategoryItem(context, 'assets/Other.png', "Other", '10'),
+                    _buildCategoryItem(context, 'assets/other.png', "Other", '10'),
                   ],
                 ),
               ),

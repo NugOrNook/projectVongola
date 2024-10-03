@@ -86,7 +86,7 @@ flutter:
     - assets/gasoline_cost.png
     - assets/medical.png
     - assets/beauty.png
-    - assets/Other.png
+    - assets/other.png
 
     - assets/warning_1.png
     - assets/warning_2.png

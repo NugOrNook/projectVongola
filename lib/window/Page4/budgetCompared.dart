@@ -101,9 +101,9 @@ class _BudgetComparedListState extends State<BudgetComparedList> {
       case 9:
         return 'assets/beauty.png';
       case 10:
-        return 'assets/Other.png';
+        return 'assets/other.png';
       default:
-        return 'assets/Other.png'; // กรณีที่ไม่มีการแมป
+        return 'assets/other.png'; // กรณีที่ไม่มีการแมป
     }
   }
 
