@@ -15,6 +15,7 @@ class AddTransaction extends StatefulWidget {
 class _AddTransactionState extends State<AddTransaction> {
   final _formKey = GlobalKey<FormBuilderState>();
   final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _dateTimeController = TextEditingController();
   final TextEditingController _memoController = TextEditingController();
   final ImageOcrHelper _imageOcrHelper = ImageOcrHelper();
   
@@ -23,15 +24,19 @@ class _AddTransactionState extends State<AddTransaction> {
   @override
   void dispose() {
     _amountController.dispose();
+    _dateTimeController.dispose();
     _memoController.dispose();
     super.dispose();
   }
 
   Future<void> _pickImageAndExtractText() async {
-    final extractedText = await _imageOcrHelper.pickImageAndExtractText();
-    if (extractedText != null) {
+    final extractedData = await _imageOcrHelper.pickImageAndExtractText();
+    if (extractedData != null) {
       setState(() {
-        _amountController.text = extractedText;
+        // ตั้งค่า amount และ datetime จาก extractedData
+        _amountController.text = extractedData['amount'] ?? '';
+        _dateTimeController.text = extractedData['datetime'] ?? '';
+        _memoController.text = extractedData['memo'] ?? '';
         _formKey.currentState?.fields['transactionType']?.didChange('1');
         _transactionType = '1';
       });
@@ -39,15 +44,19 @@ class _AddTransactionState extends State<AddTransaction> {
   }
 
   Future<void> _handleIncomingImage(String imageUri) async {
-    final extractedText = await _imageOcrHelper.extractTextFromImage(imageUri);
-    if (extractedText != null) {
+    final extractedData = await _imageOcrHelper.extractTextFromImage(imageUri);
+    if (extractedData != null) {
       setState(() {
-        _amountController.text = extractedText;
+        // ตั้งค่า amount และ datetime จาก extractedData
+        _amountController.text = extractedData['amount'] ?? '';
+        _dateTimeController.text = extractedData['datetime'] ?? '';
+        _memoController.text = extractedData['memo'] ?? '';
         _formKey.currentState?.fields['transactionType']?.didChange('1');
         _transactionType = '1';
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -142,6 +151,7 @@ class _AddTransactionState extends State<AddTransaction> {
                       offset: Offset(0, -8),  // เลื่อนขึ้นหรือลงตามที่ต้องการ
                       child:FormBuilderDateTimePicker(
                         name: 'dateTimeController',
+                        controller: _dateTimeController,
                         initialValue: DateTime.now(),
                         firstDate: DateTime(2000),
                         lastDate: DateTime(2100),
@@ -213,115 +223,115 @@ class _AddTransactionState extends State<AddTransaction> {
                     ],
                   ),
 
-
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Amount', style: TextStyle(fontSize: 14)),
-                    SizedBox(height: 10),
-                    Transform.translate(
-                      offset: Offset(0, -8),
-                      child: FormBuilderTextField(
-                        name: 'amountController',
-                        controller: _amountController,
-                        decoration: InputDecoration(
-                          hintText: 'Please enter the amount of money',
-                          hintStyle: GoogleFonts.roboto(
-                            color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.5),
-                            fontWeight: FontWeight.w300,
-                          ),
-                          border: UnderlineInputBorder(),
-                          isDense: true,
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter the amount of money';
-                          }
-                          if (double.tryParse(value) == null) {
-                            return 'Please enter a valid number';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 10),
-
-                Container(
-                  child: Padding(
-                    padding: EdgeInsets.all(0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text('Memo', style: TextStyle(fontSize: 14)),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                FormBuilderTextField(
-                  name: 'memoController',
-                  controller: _memoController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 3,
-                ),
-                SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: _pickImageAndExtractText,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.photo),
-                      SizedBox(width: 10),
-                      Text('Pick Image'),
+                      Text('Amount', style: TextStyle(fontSize: 14)),
+                      SizedBox(height: 10),
+                      Transform.translate(
+                        offset: Offset(0, -8),
+                        child: FormBuilderTextField(
+                          name: 'amountController',
+                          controller: _amountController,
+                          decoration: InputDecoration(
+                            hintText: 'Please enter the amount of money',
+                            hintStyle: GoogleFonts.roboto(
+                              color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.5),
+                              fontWeight: FontWeight.w300,
+                            ),
+                            border: UnderlineInputBorder(),
+                            isDense: true,
+                          ),
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter the amount of money';
+                            }
+                            if (double.tryParse(value) == null) {
+                              return 'Please enter a valid number';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
                     ],
                   ),
-                ),
+                  SizedBox(height: 10),
 
-                SizedBox(
-                  width: 150,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.saveAndValidate()) {
-                        var typeExpense = _formKey.currentState?.value['transactionType'];
-                        var date = _formKey.currentState?.value['dateTimeController'];
-                        var category = typeExpense == '0' ? "IC" : _formKey.currentState?.value['category']; // กำหนดค่าเป็น "None" ถ้าเป็น Income
-                        var amount = _amountController.text;
-                        var memo = _memoController.text;
-
-                        // Get category ID
-                        int? typeTransactionId = await DatabaseManagement.instance.getTypeTransactionId(category);
-
-                        if (typeTransactionId == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Invalid category selected.'),
-                            ),
-                          );
-                          return;
-                        }
-
-                        // ข้อมูลที่ต้องการบันทึก
-                        Map<String, dynamic> row = {
-                          'date_user': date.toString(),
-                          'amount_transaction': double.parse(amount),
-                          'type_expense': typeExpense == '1' ? 1 : 0,
-                          'memo_transaction': memo,
-                          'ID_type_transaction': typeTransactionId,
-                        };
-
-                        // บันทึกข้อมูลลงฐานข้อมูล
-                        await DatabaseManagement.instance.insertTransaction(row);
-
-                        // กลับไปหน้าก่อนหน้าและส่งค่า
-                        Navigator.pop(context, true);
-                      }
-                    },
-                    child: Text('Save'),
+                  Container(
+                    child: Padding(
+                      padding: EdgeInsets.all(0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Memo', style: TextStyle(fontSize: 14)),
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(height: 10),
+                  FormBuilderTextField(
+                    name: 'memoController',
+                    controller: _memoController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 3,
+                  ),
+                  SizedBox(height: 10),
+
+                  ElevatedButton(
+                    onPressed: _pickImageAndExtractText,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.photo),
+                        SizedBox(width: 10),
+                        Text('Pick Image'),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(
+                    width: 150,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.saveAndValidate()) {
+                          var typeExpense = _formKey.currentState?.value['transactionType'];
+                          var date = _dateTimeController.text;
+                          var category = typeExpense == '0' ? "IC" : _formKey.currentState?.value['category']; // กำหนดค่าเป็น "None" ถ้าเป็น Income
+                          var amount = _amountController.text;
+                          var memo = _memoController.text;
+
+                          // Get category ID
+                          int? typeTransactionId = await DatabaseManagement.instance.getTypeTransactionId(category);
+
+                          if (typeTransactionId == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Invalid category selected.'),
+                              ),
+                            );
+                            return;
+                          }
+
+                          // ข้อมูลที่ต้องการบันทึก
+                          Map<String, dynamic> row = {
+                            'date_user': date.toString(),
+                            'amount_transaction': double.parse(amount),
+                            'type_expense': typeExpense == '1' ? 1 : 0,
+                            'memo_transaction': memo,
+                            'ID_type_transaction': typeTransactionId,
+                          };
+
+                          // บันทึกข้อมูลลงฐานข้อมูล
+                          await DatabaseManagement.instance.insertTransaction(row);
+
+                          // กลับไปหน้าก่อนหน้าและส่งค่า
+                          Navigator.pop(context, true);
+                        }
+                      },
+                      child: Text('Save'),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -330,3 +340,6 @@ class _AddTransactionState extends State<AddTransaction> {
     );
   }
 }
+
+
+

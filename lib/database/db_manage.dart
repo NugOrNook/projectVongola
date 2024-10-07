@@ -7,8 +7,11 @@ import '../model/transaction_model.dart';
 class DatabaseManagement {
   
   static final DatabaseManagement instance = DatabaseManagement._init();  
-  static Database? _database;                                             
-  
+  static Database? _database;   
+  final String tableTransaction = "Transactions";
+  final String tableBudget = "Budget";
+  final String tableTypeTransaction = "Type_transaction";                                          
+    
   DatabaseManagement._init();
 
   Future<Database> get database async {
@@ -30,6 +33,7 @@ class DatabaseManagement {
     final columnAmountTransaction = 'amount_transaction';
     final columnTypeExpense = 'type_expense';
     final columnMemoTransaction = 'memo_transaction';
+    final columnReferralCode = 'referral_code';
 
     final columnIdTypeTransaction = 'ID_type_transaction';
     final columnTypeTransaction = 'type_transaction';
@@ -45,7 +49,8 @@ class DatabaseManagement {
       $columnAmountTransaction REAL NOT NULL,
       $columnTypeExpense BOOLEAN NOT NULL,
       $columnMemoTransaction TEXT,
-      $columnIdTypeTransaction INTEGER,    
+      $columnIdTypeTransaction INTEGER,  
+      $columnReferralCode TEXT,  
       FOREIGN KEY ($columnIdTypeTransaction) REFERENCES $tableTypeTransaction ($columnIdTypeTransaction)
     )''');
 
@@ -185,23 +190,35 @@ class DatabaseManagement {
     // ดึงข้อมูลจากตาราง transaction
     List<Map<String, dynamic>> transactions = await db.query(tableTransaction);
     print('Transactions:');
-    transactions.forEach((transaction) {
-      print(transaction);
-    });
-
+    printTable(transactions);
+    
     // ดึงข้อมูลจากตาราง budget
     List<Map<String, dynamic>> budgets = await db.query(tableBudget);
     print('Budgets:');
-    budgets.forEach((budget) {
-      print(budget);
-    });
-
+    printTable(budgets);
+    
     // ดึงข้อมูลจากตาราง type_transaction
     List<Map<String, dynamic>> typeTransactions = await db.query(tableTypeTransaction);
     print('Type Transactions:');
-    typeTransactions.forEach((typeTransaction) {
-      print(typeTransaction);
-    });
+    printTable(typeTransactions);
+  }
+
+  // ฟังก์ชันสำหรับแสดงข้อมูลในรูปแบบตาราง
+  void printTable(List<Map<String, dynamic>> data) {
+    if (data.isEmpty) {
+      print('No data available.');
+      return;
+    }
+
+    // แสดงชื่อคอลัมน์
+    String header = data.first.keys.join(' | ');
+    print(header);
+    print('-' * header.length); // เส้นใต้ชื่อคอลัมน์
+
+    // แสดงข้อมูล
+    for (var row in data) {
+      print(row.values.join(' | '));
+    }
   }
 
   Future<Map<int, String>> getTypeTransactionsMap() async {

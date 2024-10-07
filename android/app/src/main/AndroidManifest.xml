@@ -14,6 +14,8 @@
     -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- Required to query activities that can process text -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT" />
@@ -37,10 +39,10 @@
     <application
         android:name="android.app.Application"
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-        android:debuggable="true"
         android:enableOnBackInvokedCallback="true"
-        android:label="vongola" >
+        android:label="vongola" 
         android:icon="@mipmap/ic_launcher">
+        <!-- android:debuggable="true" -->
         <activity
             android:name="com.example.vongola.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
