@@ -284,4 +284,14 @@ class DatabaseManagement {
     final db = await instance.database;
     return await db.rawQuery(query, arguments);
   }
+
+  Future<bool> checkReferralExists(String referral) async {
+    final db = await database; // Assuming you have a method to get your database
+    final result = await db.query(
+      'transactions', // ชื่อของตารางที่เก็บข้อมูลธุรกรรม
+      where: 'referral_code = ?', // ค้นหาด้วย referral_code
+      whereArgs: [referral],
+    );
+    return result.isNotEmpty; // คืนค่า true หากพบค่า referral
+  }
 }

@@ -11,7 +11,7 @@ class ImageOcrHelper {
     if (pickedFile != null) {
       return await extractTextFromImage(pickedFile.path);
     }
-    return {'amount': null, 'datetime': null, 'memo': null};
+    return {'amount': null, 'datetime': null, 'memo': null, 'referral': null};
   }
 
   // ฟังก์ชันแปลงภาพเป็นข้อความ
@@ -24,7 +24,7 @@ class ImageOcrHelper {
     // ตรวจสอบว่าข้อความถูกดึงมาได้หรือไม่
     if (extractedText.isEmpty) {
       print("No text found.");
-      return {'amount': null, 'datetime': null, 'memo': null};
+      return {'amount': null, 'datetime': null, 'memo': null, 'referral': null};
     }
 
     // แสดงผลข้อความที่ดึงมาได้
@@ -44,7 +44,7 @@ class ImageOcrHelper {
 
     // ตรวจจับและแปลงวันที่และเวลา
     final RegExp dateTimePattern = RegExp(
-      r'(\d{1,2})\s(.?[มกพสตพธnQ].?)\s*.{0,5}\s*([คพยn])\s*.\s*(\d{2,4}).?\s*.?\s*([0|1|2|]\d{1}:\d{2}(:\d{2})?)'
+      r'(\d{1,2})\s(.?[มกพสตพธnQa].?)\s*.{0,5}\s*([คพยn])\s*.\s*(\d{2,4}).?\s*.?\s*([0|1|2|]\d{1}:\d{2}(:\d{2})?)'
     );
     final Match? dateTimeMatch = dateTimePattern.firstMatch(extractedText);
     print("DMAte : $dateTimeMatch");
@@ -70,7 +70,7 @@ class ImageOcrHelper {
         'ก ค': '07', 'n ค': '07',
         'ส ค': '08',
         'ก ย': '09',
-        'ต ค': '10', 'Q.n': '10',
+        'ต ค': '10', 'Q.n': '10', 'a.n': '10',
         'พ ย': '11',
         'ธ ค': '12',
       };
@@ -120,24 +120,37 @@ class ImageOcrHelper {
     String? formattedMemo;
 
     if (memoMatch != null) {
-      String keyword = memoMatch.group(1) ?? '';
+      //String keyword = memoMatch.group(1) ?? '';
       String memoContent = memoMatch.group(2) ?? '';
 
       // ลบช่องว่างระหว่างตัวอักษรในช่วง ก-ฮ
       formattedMemo = memoContent.replaceAll(RegExp(r'(?<=[ก-๙])\s+(?=[ก-๙])'), '');
 
-      print("Keyword: $keyword");
+      //print("Keyword: $keyword");
       print("Memo Content: $formattedMemo");
     }
     // } else {
     //   print("No match found");
     // }
     
+    final RegExp referralPattern = RegExp(r'([A-Z0-9]{13,30})');
+    final Match? referralMatch = referralPattern.firstMatch(extractedText);
+    String? referralContent;
+
+    if (referralMatch != null) {
+      // ใช้ group(0) เพื่อเข้าถึงค่าที่จับได้ทั้งหมด
+      referralContent = referralMatch.group(0) ?? '';
+      print("referral Content: $referralContent");
+    } else {
+      print("No match found");
+    }
+    
     // ส่งค่ากลับทั้งยอดรวมและวันที่/เวลา
     return {
       'amount': totalAmount > 0 ? totalAmount.toStringAsFixed(2) : null,
       'datetime': formattedDateTime,
-      'memo' : formattedMemo
+      'memo' : formattedMemo,
+      'referral' : referralContent,
     };
   }
 }

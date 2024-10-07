@@ -18,6 +18,7 @@ class _AddTransactionState extends State<AddTransaction> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _dateTimeController = TextEditingController();
   final TextEditingController _memoController = TextEditingController();
+  final TextEditingController _referralController = TextEditingController();
   final ImageOcrHelper _imageOcrHelper = ImageOcrHelper();
   
   String? _transactionType = '1'; // เก็บค่าของประเภทการทำธุรกรรม
@@ -27,6 +28,7 @@ class _AddTransactionState extends State<AddTransaction> {
     _amountController.dispose();
     _dateTimeController.dispose();
     _memoController.dispose();
+    _referralController.dispose();
     super.dispose();
   }
 
@@ -38,6 +40,7 @@ class _AddTransactionState extends State<AddTransaction> {
         _amountController.text = extractedData['amount'] ?? '';
         _dateTimeController.text = extractedData['datetime'] ?? '';
         _memoController.text = extractedData['memo'] ?? '';
+        _referralController.text = extractedData['referral'] ?? '';
         _formKey.currentState?.fields['transactionType']?.didChange('1');
         _transactionType = '1';
       });
@@ -52,6 +55,7 @@ class _AddTransactionState extends State<AddTransaction> {
         _amountController.text = extractedData['amount'] ?? '';
         _dateTimeController.text = extractedData['datetime'] ?? '';
         _memoController.text = extractedData['memo'] ?? '';
+        _referralController.text = extractedData['referral'] ?? '';
         _formKey.currentState?.fields['transactionType']?.didChange('1');
         _transactionType = '1';
       });
@@ -296,6 +300,18 @@ class _AddTransactionState extends State<AddTransaction> {
                     child: ElevatedButton(
                       onPressed: () async {
                         if (_formKey.currentState!.saveAndValidate()) {
+
+                          // ตรวจสอบว่าค่า referral ซ้ำหรือไม่
+                          bool referralExists = await DatabaseManagement.instance.checkReferralExists(_referralController.text);
+                          
+                          if (referralExists) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('This slip has already been recorded.'),
+                              ),
+                            );
+                            return; // หากซ้ำให้หยุดการทำงาน
+                          }
                           
                           // แปลงค่าที่ได้รับจาก DateTimePicker
                           DateTime dateTimeValue = _dateTimeController.text.isNotEmpty
@@ -310,8 +326,8 @@ class _AddTransactionState extends State<AddTransaction> {
                           var category = typeExpense == '0' ? "IC" : _formKey.currentState?.value['category']; // กำหนดค่าเป็น "None" ถ้าเป็น Income
                           var amount = _amountController.text;
                           var memo = _memoController.text;
+                          var referral = _referralController.text;
 
-                          // Get category ID
                           int? typeTransactionId = await DatabaseManagement.instance.getTypeTransactionId(category);
 
                           if (typeTransactionId == null) {
@@ -330,6 +346,7 @@ class _AddTransactionState extends State<AddTransaction> {
                             'type_expense': typeExpense == '1' ? 1 : 0,
                             'memo_transaction': memo,
                             'ID_type_transaction': typeTransactionId,
+                            'referral_code': referral,
                           };
 
                           // บันทึกข้อมูลลงฐานข้อมูล

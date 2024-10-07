@@ -51,6 +51,7 @@ class _BudgetComparedListState extends State<BudgetComparedList> {
 
     for (var budget in budgets) {
       if (DateTime.parse(budget['date_end']).isAfter(now)) {
+        print("Nowwwwwwww = $now");
         // ดึง balance (ผลรวมของ transaction ในช่วงเวลาที่กำหนด)
         final transactions = await db.queryAllTransactions();
         double balance = 0.0;
@@ -193,6 +194,7 @@ class _BudgetComparedListState extends State<BudgetComparedList> {
 
             // แสดงการแจ้งเตือนเมื่อ progress > 0.8 และยังไม่เคยแสดงมาก่อนในวันนี้สำหรับ id นี้
             if (progress > 0.8 && _alertShownMap[idTypeTransaction] == false) {
+              _alertShownMap[idTypeTransaction] = true; // อัปเดตว่าแสดงแจ้งเตือนแล้ว
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 _showAlertDialog(context, getText(idTypeTransaction), balance, idTypeTransaction);
               });
