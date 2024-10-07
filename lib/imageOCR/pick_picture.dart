@@ -44,7 +44,7 @@ class ImageOcrHelper {
 
     // ตรวจจับและแปลงวันที่และเวลา
     final RegExp dateTimePattern = RegExp(
-      r'(\d{1,2})\s(.?[มกพสตพธn].?)\s*.{0,5}\s*([คพย])\s*.\s*(\d{2,4}).?\s*.?\s*(\d{1,3}:\d{2}(:\d{2})?)'
+      r'(\d{1,2})\s(.?[มกพสตพธnQ].?)\s*.{0,5}\s*([คพยn])\s*.\s*(\d{2,4}).?\s*.?\s*([0|1|2|]\d{1}:\d{2}(:\d{2})?)'
     );
     final Match? dateTimeMatch = dateTimePattern.firstMatch(extractedText);
     print("DMAte : $dateTimeMatch");
@@ -70,7 +70,7 @@ class ImageOcrHelper {
         'ก ค': '07', 'n ค': '07',
         'ส ค': '08',
         'ก ย': '09',
-        'ต ค': '10',
+        'ต ค': '10', 'Q.n': '10',
         'พ ย': '11',
         'ธ ค': '12',
       };
@@ -92,14 +92,17 @@ class ImageOcrHelper {
 
        // สร้างรูปแบบวันที่และเวลา
       String hour = time.split(':')[0].padLeft(2, '0');
-      String minute = time.split(':')[1];
-      String second = time.split(':').length > 2 ? time.split(':')[2] : '00'; // ถ้าไม่มีวินาทีให้เป็น '00'
+      String minute = time.split(':')[1].padLeft(2, '0'); // เพิ่ม padLeft เพื่อให้มีสองหลัก
+      String second = time.split(':').length > 2 ? time.split(':')[2].padLeft(2, '0') : '00'; // เพิ่ม padLeft ให้วินาที
       String dateTimeString = '$year-$month-$day $hour:$minute:$second';
+
+      // ตรวจสอบว่า dateTimeString มีรูปแบบที่ถูกต้อง
+      print("dateTimeString: $dateTimeString"); // แสดงค่าที่สร้างขึ้นเพื่อการตรวจสอบ
 
       // แปลงเป็น DateTime
       try {
         DateTime dateTime = DateTime.parse(dateTimeString);
-        formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+        formattedDateTime = DateFormat('dd/MM/yyyy HH:mm:ss').format(dateTime);
       } catch (e) {
         print("Error parsing date: $e");
         formattedDateTime = null;  

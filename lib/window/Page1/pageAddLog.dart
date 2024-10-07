@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:intl/intl.dart';
 import '../../../imageOCR/pick_picture.dart';
 import '../../../database/db_manage.dart';
 import 'package:flutter/services.dart';
@@ -31,7 +32,7 @@ class _AddTransactionState extends State<AddTransaction> {
 
   Future<void> _pickImageAndExtractText() async {
     final extractedData = await _imageOcrHelper.pickImageAndExtractText();
-    if (extractedData != null) {
+    //if (extractedData != null) {
       setState(() {
         // ตั้งค่า amount และ datetime จาก extractedData
         _amountController.text = extractedData['amount'] ?? '';
@@ -40,12 +41,12 @@ class _AddTransactionState extends State<AddTransaction> {
         _formKey.currentState?.fields['transactionType']?.didChange('1');
         _transactionType = '1';
       });
-    }
+    //}
   }
 
   Future<void> _handleIncomingImage(String imageUri) async {
     final extractedData = await _imageOcrHelper.extractTextFromImage(imageUri);
-    if (extractedData != null) {
+    //if (extractedData != null) {
       setState(() {
         // ตั้งค่า amount และ datetime จาก extractedData
         _amountController.text = extractedData['amount'] ?? '';
@@ -54,7 +55,7 @@ class _AddTransactionState extends State<AddTransaction> {
         _formKey.currentState?.fields['transactionType']?.didChange('1');
         _transactionType = '1';
       });
-    }
+    //}
   }
 
 
@@ -295,8 +296,17 @@ class _AddTransactionState extends State<AddTransaction> {
                     child: ElevatedButton(
                       onPressed: () async {
                         if (_formKey.currentState!.saveAndValidate()) {
+                          
+                          // แปลงค่าที่ได้รับจาก DateTimePicker
+                          DateTime dateTimeValue = _dateTimeController.text.isNotEmpty
+                              ? DateFormat('dd/MM/yyyy HH:mm:ss').parse(_dateTimeController.text) // แปลงจาก dd/MM/yyyy HH:mm:ss
+                              : DateTime.now(); // หากไม่มีค่าใช้ค่าเริ่มต้นเป็นตอนนี้
+                          
+                          // แปลงค่าที่แปลงได้ให้เป็นรูปแบบที่ต้องการ
+                          String formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTimeValue);
+
                           var typeExpense = _formKey.currentState?.value['transactionType'];
-                          var date = _dateTimeController.text;
+                          var date = formattedDate;
                           var category = typeExpense == '0' ? "IC" : _formKey.currentState?.value['category']; // กำหนดค่าเป็น "None" ถ้าเป็น Income
                           var amount = _amountController.text;
                           var memo = _memoController.text;

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import '../../database/db_manage.dart';
-import '../Page2/page2.dart';
 
 class CardDashBoard extends StatefulWidget {
   @override
@@ -104,7 +103,7 @@ class _CardDashBoardState extends State<CardDashBoard> {
                         clipBehavior: Clip.hardEdge,
                         child: InkWell(
                           child: SizedBox(
-                            width: 185, // Card width
+                            width: 180, // Card width
                             height: 65, // Card height
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: 12),
@@ -197,13 +196,13 @@ class _CardDashBoardState extends State<CardDashBoard> {
                         clipBehavior: Clip.hardEdge,
                         child: InkWell(
                           child: SizedBox(
-                            width: 85,
+                            width: 90,
                             height: 65,
                             child: Center(
                               child: Text(
-                                '${expensePercentage.toStringAsFixed(0)} %',
+                                '${expensePercentage.toStringAsFixed(1)} %',
                                 style: TextStyle(
-                                  fontSize: 24,
+                                  fontSize: 22,
                                   fontWeight: FontWeight.bold,
                                   color: const Color.fromARGB(255, 38, 38, 38),
                                 ),

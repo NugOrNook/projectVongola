@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import '../model/transaction_model.dart';
 
 // สร้าง class จัดการข้อมูล
 class DatabaseManagement {
