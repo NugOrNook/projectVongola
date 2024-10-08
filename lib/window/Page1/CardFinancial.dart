@@ -53,16 +53,18 @@ class CardFinancial extends StatelessWidget {
       case 4:
         return 'assets/electricity_bill.png';
       case 5:
-        return 'assets/house.png';
+        return 'assets/internet.png';
       case 6:
-        return 'assets/car.png';
+        return 'assets/house.png';
       case 7:
-        return 'assets/gasoline_cost.png';
+        return 'assets/car.png';
       case 8:
-        return 'assets/medical.png';
+        return 'assets/gasoline_cost.png';
       case 9:
-        return 'assets/beauty.png';
+        return 'assets/medical.png';
       case 10:
+        return 'assets/beauty.png';
+      case 11:
         return 'assets/other.png';
       default:
         return 'assets/other.png';

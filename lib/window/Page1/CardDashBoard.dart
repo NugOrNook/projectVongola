@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import '../../database/db_manage.dart';
+import 'noDataDashBoard.dart';
 
 class CardDashBoard extends StatefulWidget {
+  final Future<List<Map<String, dynamic>>> cardFuture;
+
+  CardDashBoard({required this.cardFuture});
+
   @override
   _CardDashBoardState createState() => _CardDashBoardState();
 }
@@ -18,12 +23,19 @@ class _CardDashBoardState extends State<CardDashBoard> {
   @override
   void initState() {
     super.initState();
-    _calculateExpensePercentage();
+    _refreshData(); // เรียกใช้งานฟังก์ชัน refresh ข้อมูลเมื่อเริ่มต้น
   }
 
-  Future<void> _calculateExpensePercentage() async {
-    
-    DateTime now = DateTime.now(); 
+  @override
+  void didUpdateWidget(CardDashBoard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.cardFuture != widget.cardFuture) {
+      _refreshData(); // รีเฟรชข้อมูลเมื่อ cardFuture เปลี่ยนแปลง
+    }
+  }
+
+  Future<void> _refreshData() async {
+    DateTime now = DateTime.now();
     monthName = DateFormat('MMMM').format(now);
     year = DateFormat('yyyy').format(now);
 
@@ -35,190 +47,190 @@ class _CardDashBoardState extends State<CardDashBoard> {
       [DateFormat('MM').format(now), DateFormat('yyyy').format(now)]
     );
 
-    if (transactions.isEmpty) {
-      setState(() {
-        totalIncome = 0.0;
-        totalExpense = 0.0;
-        expensePercentage = 0.0;
-      });
-      return;
-    }
+    double income = 0.0;
+    double expense = 0.0;
 
     for (var transaction in transactions) {
       double amount = transaction['amount_transaction'];
-      bool isExpense = transaction['type_expense'] == 1; // Assuming 1 is for expense, 0 for income
+      bool isExpense = transaction['type_expense'] == 1;
 
       if (isExpense) {
-        totalExpense += amount;
+        expense += amount;
       } else {
-        totalIncome += amount;
+        income += amount;
       }
     }
 
-    // Check 
-    //print("Total Expense: $totalExpense, Total Income: $totalIncome"); 
-
-    // Calculate expense percentage
-    double percentage = (totalIncome > 0) ? (totalExpense / totalIncome) * 100 : 0;
-
     setState(() {
-      expensePercentage = percentage;
+      totalIncome = income;
+      totalExpense = expense;
+      expensePercentage = (totalIncome > 0) ? (totalExpense / totalIncome) * 100 : 0;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Card(
-        color: Color.fromARGB(255, 9, 209, 220), // Card color
-        clipBehavior: Clip.hardEdge,
-        child: InkWell(
-          splashColor: Colors.blue.withAlpha(30), // Color when tapped
-          child: SizedBox(
-            width: 320, // Card width
-            height: 130, // Card height
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start, // Align text to the top
-              crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
-              children: [
-                Container(
-                  padding: EdgeInsets.only(left: 20, top: 12), 
-                  child: Text(
-                    'Summary for $monthName $year',
-                    style: TextStyle(
-                      color: Colors.white, 
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold, 
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-
-                Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(left: 15),
-                      child: Card(
-                        color: Color.fromARGB(255, 235, 249, 255), // Card color
-                        clipBehavior: Clip.hardEdge,
-                        child: InkWell(
-                          child: SizedBox(
-                            width: 180, // Card width
-                            height: 65, // Card height
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'Income',
-                                        style: TextStyle(
-                                          color: const Color.fromARGB(255, 53, 53, 53), 
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      RichText(
-                                        text: TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: '${totalIncome.toStringAsFixed(2)}', 
-                                              style: TextStyle(
-                                                color: Colors.green,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: ' ฿',
-                                              style: TextStyle(
-                                                color: const Color.fromARGB(255, 53, 53, 53),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'Expense',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      RichText(
-                                        text: TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: '${totalExpense.toStringAsFixed(2)}',
-                                              style: TextStyle(
-                                                color: Colors.red,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: ' ฿',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
+    return FutureBuilder(
+      future: widget.cardFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: NoDataDashBoard());
+        } else {
+          // ใช้ NumberFormat เพื่อจัดรูปแบบจำนวนเงิน
+          final NumberFormat currencyFormat = NumberFormat("#,##0.00", "en_US");
+          
+          return Center(
+            child: Card(
+              color: Color.fromARGB(255, 9, 209, 220),
+              clipBehavior: Clip.hardEdge,
+              child: InkWell(
+                splashColor: Colors.blue.withAlpha(30),
+                child: SizedBox(
+                  width: 320,
+                  height: 130,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(left: 20, top: 12),
+                        child: Text(
+                          'Summary for $monthName $year',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 4),
-
-                    Container(
-                      padding: EdgeInsets.only(left: 0),
-                      child: Card(
-                        color: Color.fromARGB(255, 218, 244, 255),
-                        clipBehavior: Clip.hardEdge,
-                        child: InkWell(
-                          child: SizedBox(
-                            width: 90,
-                            height: 65,
-                            child: Center(
-                              child: Text(
-                                '${expensePercentage.toStringAsFixed(1)} %',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color.fromARGB(255, 38, 38, 38),
+                      SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(left: 15),
+                            child: Card(
+                              color: Color.fromARGB(255, 235, 249, 255),
+                              clipBehavior: Clip.hardEdge,
+                              child: SizedBox(
+                                width: 180,
+                                height: 65,
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 12),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'Income',
+                                            style: TextStyle(
+                                              color: const Color.fromARGB(255, 53, 53, 53),
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          RichText(
+                                            text: TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: '${currencyFormat.format(totalIncome)}',
+                                                  style: TextStyle(
+                                                    color: Colors.green,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text: ' ฿',
+                                                  style: TextStyle(
+                                                    color: const Color.fromARGB(255, 53, 53, 53),
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'Expense',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          RichText(
+                                            text: TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: '${currencyFormat.format(totalExpense)}',
+                                                  style: TextStyle(
+                                                    color: Colors.red,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text: ' ฿',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
+                          SizedBox(width: 4),
+                          Container(
+                            padding: EdgeInsets.only(left: 0),
+                            child: Card(
+                              color: Color.fromARGB(255, 218, 244, 255),
+                              clipBehavior: Clip.hardEdge,
+                              child: SizedBox(
+                                width: 90,
+                                height: 65,
+                                child: Center(
+                                  child: Text(
+                                    '${expensePercentage.toStringAsFixed(1)} %',
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color.fromARGB(255, 38, 38, 38),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
+          );
+        }
+      },
     );
   }
 }

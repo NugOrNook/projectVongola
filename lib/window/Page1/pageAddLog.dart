@@ -348,7 +348,6 @@ class _AddTransactionState extends State<AddTransaction> {
                             'ID_type_transaction': typeTransactionId,
                             'referral_code': referral,
                           };
-
                           // บันทึกข้อมูลลงฐานข้อมูล
                           await DatabaseManagement.instance.insertTransaction(row);
 

@@ -22,7 +22,7 @@ class DatabaseManagement {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();                          
     final path = join(dbPath, filePath);      
-    //await deleteDatabase(path); // ลบฐานข้อมูลหากมีอยู่แล้ว                        
+    await deleteDatabase(path); // ลบฐานข้อมูลหากมีอยู่แล้ว                        
     return await openDatabase(path, version: 1, onCreate: _createDB); 
   }
 
@@ -71,6 +71,7 @@ class DatabaseManagement {
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Travel expenses' });
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Water bill' });
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Electricity bill' });
+    await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Internet' });
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'House cost' });
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Car fare' });
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Gasoline cost' });
@@ -167,20 +168,20 @@ class DatabaseManagement {
   }
 
   // ---------------------------{ delete ตาราง }----------------------------
-  // Future<int> deleteAllTransactions() async {
-  //   final db = await instance.database;
-  //   return await db.delete('transactions');
-  // }
+  Future<int> deleteAllTransactions() async {
+    final db = await instance.database;
+    return await db.delete('transactions');
+  }
   
-  // Future<int> deleteAllBudgets() async {
-  //   final db = await instance.database;
-  //   return await db.delete('Budget');
-  // }
+  Future<int> deleteAllBudgets() async {
+    final db = await instance.database;
+    return await db.delete('Budget');
+  }
 
-  // Future close() async {
-  //   final db = await instance.database;
-  //   db.close();
-  // }
+  Future close() async {
+    final db = await instance.database;
+    db.close();
+  }
   // ------------------------------------------------------
   
   Future<void> showAllData() async {
@@ -285,13 +286,19 @@ class DatabaseManagement {
     return await db.rawQuery(query, arguments);
   }
 
-  Future<bool> checkReferralExists(String referral) async {
-    final db = await database; // Assuming you have a method to get your database
-    final result = await db.query(
-      'transactions', // ชื่อของตารางที่เก็บข้อมูลธุรกรรม
-      where: 'referral_code = ?', // ค้นหาด้วย referral_code
-      whereArgs: [referral],
+  Future<bool> checkReferralExists(String? referral) async {
+    if (referral == null || referral.isEmpty) {
+      return false; // ไม่ซ้ำหากค่าเป็น null หรือว่าง
+    }
+
+    final db = await instance.database;
+
+    // query เพื่อตรวจสอบความซ้ำซ้อนในฐานข้อมูล
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) FROM transactions WHERE referral_code = ?',
+      [referral],
     );
-    return result.isNotEmpty; // คืนค่า true หากพบค่า referral
+
+    return Sqflite.firstIntValue(result)! > 0;
   }
 }

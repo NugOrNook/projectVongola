@@ -25,6 +25,7 @@ class _Page2State extends State<Page2> {
     'Travel expenses': 'assets/travel_expenses.png',
     'Water bill': 'assets/water_bill.png',
     'Electricity bill': 'assets/electricity_bill.png',
+    'Internet cost': 'assets/internet.png',
     'House cost': 'assets/house.png',
     'Car fare': 'assets/car.png',
     'Gasoline cost': 'assets/gasoline_cost.png',
@@ -330,6 +331,9 @@ class _Page2State extends State<Page2> {
                         } else if (expense['type'] == 'Electricity bill' &&
                             expense['incomeexpense'] == 1) {
                           imagetype = 'assets/electricity_bill.png';
+                        } else if (expense['type'] == 'Internet cost' &&
+                            expense['incomeexpense'] == 1) {
+                          imagetype = 'assets/internet.png';
                         } else if (expense['type'] == 'House cost' &&
                             expense['incomeexpense'] == 1) {
                           imagetype = 'assets/house.png';

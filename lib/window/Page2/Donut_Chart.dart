@@ -55,11 +55,26 @@ class PieChartWidget extends StatelessWidget {
       ),
     );
   }
+  
+  final Map<String, Color>typeToColor={
+  'Food': Colors.red,
+  'Travel expenses': Colors.green,
+  'Water bill':Colors.blue,
+  'Electricity bill':Colors.yellow,
+  'House cost':Colors.orange,
+  'Car fare' :const Color.fromARGB(255, 153, 50, 50),
+  'Gasoline cost' :const Color.fromARGB(255, 203, 214, 97),
+  'Medical expenses' :const Color.fromARGB(255, 5, 96, 8),
+  'Beauty expenses' :Colors.pink,
+  'Other' :Colors.black,
+  'IC' :const Color.fromARGB(255, 154, 219, 156),
+  };
 
   List<PieChartSectionData> _createPieChartSections() {
     return dataMap.entries.map((entry) {
       return PieChartSectionData(
-        color: Colors.primaries[dataMap.keys.toList().indexOf(entry.key) % Colors.primaries.length],
+        //color: Colors.primaries[dataMap.keys.toList().indexOf(entry.key) % Colors.primaries.length],
+        color:typeToColor[entry.key]??Colors.grey,
         value: entry.value,
         title: entry.key,
         radius: 50,

@@ -82,6 +82,8 @@ class TransactionList extends StatelessWidget {
                 imagePath = 'assets/money.png'; // รูปภาพสำหรับรายรับ
               } else if (item['type_transaction'] == 'Electricity bill') {
                 imagePath = 'assets/electricity_bill.png';
+              } else if (item['type_transaction'] == 'Internet cost') {
+                imagePath = 'assets/internt.png';
               } else if (item['type_transaction'] == 'Food') {
                 imagePath = 'assets/food.png';
               } else if (item['type_transaction'] == 'Travel expenses') {

@@ -83,6 +83,7 @@ flutter:
     - assets/travel_expenses.png
     - assets/water_bill.png
     - assets/electricity_bill.png
+    - assets/internet.png
     - assets/house.png
     - assets/car.png
     - assets/gasoline_cost.png
