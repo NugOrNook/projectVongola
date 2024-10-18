@@ -18,22 +18,6 @@ class PieChartWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTitle(),
-          if (pieChartSections.isEmpty)
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(height: 50), // เพิ่มระยะห่างจากข้างบน
-                  Image.asset(
-                    'assets/Zzz.png', // ใส่ path รูปภาพที่คุณต้องการ
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.cover,
-                  ),
-                ],
-              ),
-            )
-          else
             Column(
               children: [
                 Container(
@@ -47,7 +31,7 @@ class PieChartWidget extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 5),
-                _buildIndicator(pieChartSections), // แสดง Indicator ใต้ Pie Chart
+                _buildIndicator(pieChartSections),
               ],
             ),
           SizedBox(height: 30),
@@ -55,26 +39,27 @@ class PieChartWidget extends StatelessWidget {
       ),
     );
   }
-  
-  final Map<String, Color>typeToColor={
-  'Food': Colors.red,
-  'Travel expenses': Colors.green,
-  'Water bill':Colors.blue,
-  'Electricity bill':Colors.yellow,
-  'House cost':Colors.orange,
-  'Car fare' :const Color.fromARGB(255, 153, 50, 50),
-  'Gasoline cost' :const Color.fromARGB(255, 203, 214, 97),
-  'Medical expenses' :const Color.fromARGB(255, 5, 96, 8),
-  'Beauty expenses' :Colors.pink,
-  'Other' :Colors.black,
-  'IC' :const Color.fromARGB(255, 154, 219, 156),
-  };
+  final Map<String, Color> typeToColor = {
+    'Food': Colors.blueAccent,
+    'Travel expenses': Colors.lightGreenAccent,
+    'Water bill': Colors.lightBlueAccent,
+    'Electricity bill': Colors.yellow,
+    'Internet cost': Colors.pink, 
+    'House cost': Colors.deepOrangeAccent,
+    'Car fare': Colors.deepPurpleAccent,
+    'Gasoline cost': Colors.orangeAccent,
+    'Medical expenses': Colors.indigo,
+    'Beauty expenses': Colors.black,
+    'Cost of equipment': Colors.blue.shade100,
+    'Other': Colors.teal.shade400,
 
+
+  };
   List<PieChartSectionData> _createPieChartSections() {
     return dataMap.entries.map((entry) {
       return PieChartSectionData(
         //color: Colors.primaries[dataMap.keys.toList().indexOf(entry.key) % Colors.primaries.length],
-        color:typeToColor[entry.key]??Colors.grey,
+        color: typeToColor[entry.key] ?? Colors.grey, // ใช้สีจาก typeToColor
         value: entry.value,
         title: entry.key,
         radius: 50,

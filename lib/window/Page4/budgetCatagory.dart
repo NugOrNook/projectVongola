@@ -33,7 +33,7 @@ class _Budgetcatagory extends State<Budgetcatagory> {
                 _buildBudgetItem('assets/travel_expenses.png', "Travel expenses", '2'),
                 _buildBudgetItem('assets/water_bill.png', "Water bill", '3'),
                 _buildBudgetItem('assets/electricity_bill.png', "Electricity bill", '4'),
-                _buildBudgetItem('assets/internet.png', "Electricity bill", '5'),
+                _buildBudgetItem('assets/internet.png', "Internet cost", '5'),
                 _buildBudgetItem('assets/house.png', "House cost", '6'),
                 _buildBudgetItem('assets/car.png', "Car fare", '7'),
                 _buildBudgetItem('assets/gasoline_cost.png', "Gasoline cost", '8'),

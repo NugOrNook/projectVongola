@@ -22,7 +22,7 @@ class DatabaseManagement {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();                          
     final path = join(dbPath, filePath);      
-    await deleteDatabase(path); // ลบฐานข้อมูลหากมีอยู่แล้ว                        
+    //await deleteDatabase(path); // ลบฐานข้อมูลหากมีอยู่แล้ว                        
     return await openDatabase(path, version: 1, onCreate: _createDB); 
   }
 
@@ -71,7 +71,7 @@ class DatabaseManagement {
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Travel expenses' });
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Water bill' });
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Electricity bill' });
-    await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Internet' });
+    await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Internet cost' });
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'House cost' });
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Car fare' });
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Gasoline cost' });
@@ -168,20 +168,20 @@ class DatabaseManagement {
   }
 
   // ---------------------------{ delete ตาราง }----------------------------
-  Future<int> deleteAllTransactions() async {
-    final db = await instance.database;
-    return await db.delete('transactions');
-  }
+  // Future<int> deleteAllTransactions() async {
+  //   final db = await instance.database;
+  //   return await db.delete('transactions');
+  // }
   
-  Future<int> deleteAllBudgets() async {
-    final db = await instance.database;
-    return await db.delete('Budget');
-  }
+  // Future<int> deleteAllBudgets() async {
+  //   final db = await instance.database;
+  //   return await db.delete('Budget');
+  // }
 
-  Future close() async {
-    final db = await instance.database;
-    db.close();
-  }
+  // Future close() async {
+  //   final db = await instance.database;
+  //   db.close();
+  // }
   // ------------------------------------------------------
   
   Future<void> showAllData() async {

@@ -43,12 +43,11 @@ class _Page2State extends State<Page2> {
   }
 
   Future<void> _fetch_Mark_Dates() async {
-    final List<Map<String, dynamic>> result = await DatabaseManagement.instance
-        .rawQuery(
+    final List<Map<String, dynamic>> result = await DatabaseManagement.instance.rawQuery(
         '''
       SELECT DISTINCT DATE(date_user) as date_user 
       FROM Transactions
-      '''
+        '''
     );
     setState(() {
       markedDates =

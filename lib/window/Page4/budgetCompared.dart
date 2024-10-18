@@ -121,16 +121,18 @@ class _BudgetComparedListState extends State<BudgetComparedList> {
       case 4:
         return 'Electricity';
       case 5:
-        return 'House';
+        return 'Internet';
       case 6:
-        return 'Car';
+        return 'House';
       case 7:
-        return 'Gasoline';
+        return 'Car';
       case 8:
-        return 'Medical';
+        return 'Gasoline';
       case 9:
-        return 'Beauty';
+        return 'Medical';
       case 10:
+        return 'Beauty';
+      case 11:
         return 'Other';
       default:
         return 'Other'; // กรณีที่ไม่มีการแมป

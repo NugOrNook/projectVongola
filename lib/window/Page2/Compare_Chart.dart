@@ -6,7 +6,6 @@ class CompareChart extends StatelessWidget {
   final double totalExpense;
 
   CompareChart({required this.totalIncome, required this.totalExpense});
-
   @override
   Widget build(BuildContext context) {
     return Padding(
