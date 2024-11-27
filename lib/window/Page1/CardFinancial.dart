@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../database/db_manage.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CardFinancial extends StatelessWidget {
   final Future<List<Map<String, dynamic>>> transactionsFuture;
@@ -71,46 +72,47 @@ class CardFinancial extends StatelessWidget {
     }
   }
 
-  String getText(int idTypeTransaction) {
+  String getText(BuildContext context, int idTypeTransaction) {
+    final localizations = AppLocalizations.of(context)!; // ใช้ AppLocalizations
     switch (idTypeTransaction) {
       case 1:
-        return 'Food';
+        return localizations.food; // เปลี่ยนให้ใช้ค่าใน AppLocalizations
       case 2:
-        return 'Travel';
+        return localizations.travelexpenses;
       case 3:
-        return 'Water';
+        return localizations.waterbill;
       case 4:
-        return 'Electricity';
+        return localizations.electricitybill;
       case 5:
-        return 'Internet';  
+        return localizations.internetcost;
       case 6:
-        return 'House';
+        return localizations.housecost;
       case 7:
-        return 'Car';
+        return localizations.carfare;
       case 8:
-        return 'Gasoline';
+        return localizations.gasolinecost;
       case 9:
-        return 'Medical';
+        return localizations.medicalexpenses;
       case 10:
-        return 'Beauty';
+        return localizations.beautyexpenses;
       case 11:
-        return 'Other';
+        return localizations.other;
       default:
-        return 'Other';
+        return localizations.other;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return FutureBuilder<List<Map<String, dynamic>>>(
       future: fetchBudgetData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No data available'));
+          return Center(child: Text(localizations.nodata));
         }
-
         final budgetList = snapshot.data!;
 
         return ListView.builder(
@@ -119,9 +121,8 @@ class CardFinancial extends StatelessWidget {
           itemBuilder: (context, index) {
             final budgetData = budgetList[index];
             final double balance = budgetData['balance'] ?? 0.0;
-            final double progress = budgetData['progress'] > 1.0 ? 1.0 : budgetData['progress']; // จำกัดค่าไม่ให้เกิน 1.0 (100%)
+            final double progress = budgetData['progress'] > 1.0 ? 1.0 : budgetData['progress'];
             final int idTypeTransaction = budgetData['idTypeTransaction'] ?? 0;
-
             return Column(
               children: [
                 Container(
@@ -153,7 +154,7 @@ class CardFinancial extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  getText(idTypeTransaction),
+                                  getText(context, idTypeTransaction),
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
@@ -161,7 +162,7 @@ class CardFinancial extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  'Spent  ${balance.toStringAsFixed(0)}  THB',
+                                  '${localizations.spent} ${balance.toStringAsFixed(0)} ${localizations.thb}',
                                   style: TextStyle(
                                     color: const Color.fromARGB(255, 149, 149, 149),
                                     fontSize: 12,
@@ -174,7 +175,7 @@ class CardFinancial extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                '${(progress * 100).toStringAsFixed(0)}%',  // จำกัดค่าไม่ให้เกิน 100%
+                                '${(progress * 100).toStringAsFixed(0)}%',
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -186,7 +187,7 @@ class CardFinancial extends StatelessWidget {
                         ],
                       ),
                       Container(
-                        padding: EdgeInsets.only(left: 68, top: 0, bottom: 0), // ลดระยะห่างจากด้านล่าง
+                        padding: EdgeInsets.only(left: 68, top: 0, bottom: 0),
                         child: LinearProgressIndicator(
                           value: progress,
                           backgroundColor: Colors.grey[300],

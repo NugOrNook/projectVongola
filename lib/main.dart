@@ -8,13 +8,15 @@ import '../database/db_manage.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await DatabaseManagement.instance.database;  // Initialize the database
-  await DatabaseManagement.instance.showAllData();  // Call the function to show data
-  await initializeDateFormatting('th', null);  // Initialize ข้อมูล locale สำหรับภาษาไทย
+  await DatabaseManagement.instance.database;
+  await DatabaseManagement.instance.showAllData();
+  await initializeDateFormatting('th', null);
 
-  runApp(MyApp());  // เริ่มแอปพลิเคชัน
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -33,14 +35,13 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       localizationsDelegates: [
+        ...AppLocalizations.localizationsDelegates,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: [
-        const Locale('en', ''), // ภาษาอังกฤษ
-        const Locale('th', ''), // ภาษาไทย
-      ],
+
+      supportedLocales: AppLocalizations.supportedLocales,
       // home: MyHomePage(),
       initialRoute: '/',
       routes: {
@@ -85,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
               width: 30,
               height: 30,
             ),
-            label: 'Home',
+            label: AppLocalizations.of(context)!.home,
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
@@ -93,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
               width: 30,
               height: 30,
             ),
-            label: 'Dashboard',
+            label: AppLocalizations.of(context)!.dashboard,
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
@@ -101,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
               width: 30,
               height: 30,
             ),
-            label: 'Wallet',
+            label: AppLocalizations.of(context)!.wallet,
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
@@ -109,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
               width: 30,
               height: 30,
             ),
-            label: 'Budget',
+            label: AppLocalizations.of(context)!.budget, // ใช้ localization
           ),
         ],
         currentIndex: _selectedIndex,

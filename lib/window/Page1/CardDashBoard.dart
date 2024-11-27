@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'dart:async';
 import '../../database/db_manage.dart';
 import 'noDataDashBoard.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class CardDashBoard extends StatefulWidget {
   final Future<List<Map<String, dynamic>>> cardFuture;
@@ -21,9 +23,9 @@ class _CardDashBoardState extends State<CardDashBoard> {
   String year = '';
 
   @override
-  void initState() {
-    super.initState();
-    _refreshData(); // เรียกใช้งานฟังก์ชัน refresh ข้อมูลเมื่อเริ่มต้น
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _refreshData();
   }
 
   @override
@@ -36,15 +38,15 @@ class _CardDashBoardState extends State<CardDashBoard> {
 
   Future<void> _refreshData() async {
     DateTime now = DateTime.now();
-    monthName = DateFormat('MMMM').format(now);
+    monthName = DateFormat('MMMM', Localizations.localeOf(context).languageCode).format(now);
     year = DateFormat('yyyy').format(now);
 
     List<Map<String, dynamic>> transactions = await DatabaseManagement.instance.rawQuery(
-      '''
+        '''
       SELECT amount_transaction, type_expense FROM [Transactions]
       WHERE strftime('%m', date_user) = ? AND strftime('%Y', date_user) = ?
       ''',
-      [DateFormat('MM').format(now), DateFormat('yyyy').format(now)]
+        [DateFormat('MM').format(now), DateFormat('yyyy').format(now)]
     );
 
     double income = 0.0;
@@ -64,8 +66,22 @@ class _CardDashBoardState extends State<CardDashBoard> {
     setState(() {
       totalIncome = income;
       totalExpense = expense;
-      expensePercentage = (totalIncome > 0) ? (totalExpense / totalIncome) * 100 : 0;
+      expensePercentage = (totalIncome > 0)
+          ? ((1 - (totalExpense / totalIncome)) * 100).clamp(-double.infinity, 100)
+          : -100;
     });
+  }
+
+  Color getPercentageColor(double percentage) {
+    if (percentage >= 51) {
+      return Colors.blue;
+    } else if (percentage >= 21) {
+      return Colors.green;
+    } else if (percentage >= 1) {
+      return Colors.orange;
+    } else {
+      return Colors.red;
+    }
   }
 
   @override
@@ -80,9 +96,8 @@ class _CardDashBoardState extends State<CardDashBoard> {
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(child: NoDataDashBoard());
         } else {
-          // ใช้ NumberFormat เพื่อจัดรูปแบบจำนวนเงิน
           final NumberFormat currencyFormat = NumberFormat("#,##0.00", "en_US");
-          
+          final localizations = AppLocalizations.of(context)!;
           return Center(
             child: Card(
               color: Color.fromARGB(255, 9, 209, 220),
@@ -99,7 +114,7 @@ class _CardDashBoardState extends State<CardDashBoard> {
                       Container(
                         padding: EdgeInsets.only(left: 20, top: 12),
                         child: Text(
-                          'Summary for $monthName $year',
+                          '${localizations.summaryFor} $monthName $year',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -127,34 +142,36 @@ class _CardDashBoardState extends State<CardDashBoard> {
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            'Income',
+                                            localizations.income,
                                             style: TextStyle(
                                               color: const Color.fromARGB(255, 53, 53, 53),
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          RichText(
-                                            text: TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text: '${currencyFormat.format(totalIncome)}',
-                                                  style: TextStyle(
-                                                    color: Colors.green,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              AutoSizeText(
+                                                ' ${currencyFormat.format(totalIncome)}',
+                                                style: TextStyle(
+                                                  color: Colors.green,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
-                                                TextSpan(
-                                                  text: ' ฿',
-                                                  style: TextStyle(
-                                                    color: const Color.fromARGB(255, 53, 53, 53),
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                                minFontSize: 12,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              Text(
+                                                '฿',
+                                                style: TextStyle(
+                                                  color: const Color.fromARGB(255, 53, 53, 53),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
@@ -162,34 +179,36 @@ class _CardDashBoardState extends State<CardDashBoard> {
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            'Expense',
+                                            localizations.expense,
                                             style: TextStyle(
-                                              color: Colors.black,
+                                              color: const Color.fromARGB(255, 53, 53, 53),
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          RichText(
-                                            text: TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text: '${currencyFormat.format(totalExpense)}',
-                                                  style: TextStyle(
-                                                    color: Colors.red,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              AutoSizeText(
+                                                ' ${currencyFormat.format(totalExpense)}',
+                                                style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
-                                                TextSpan(
-                                                  text: ' ฿',
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                                minFontSize: 12,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              Text(
+                                                '฿',
+                                                style: TextStyle(
+                                                  color: const Color.fromARGB(255, 53, 53, 53),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
@@ -209,13 +228,16 @@ class _CardDashBoardState extends State<CardDashBoard> {
                                 width: 90,
                                 height: 65,
                                 child: Center(
-                                  child: Text(
-                                    '${expensePercentage.toStringAsFixed(1)} %',
+                                  child: AutoSizeText(
+                                    '${expensePercentage.toStringAsFixed(1)}%',
                                     style: TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
-                                      color: const Color.fromARGB(255, 38, 38, 38),
+                                      color: getPercentageColor(expensePercentage),
                                     ),
+                                    minFontSize: 10,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),

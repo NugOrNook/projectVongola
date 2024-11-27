@@ -1,36 +1,96 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CompareChart extends StatelessWidget {
   final double totalIncome;
   final double totalExpense;
 
   CompareChart({required this.totalIncome, required this.totalExpense});
+
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
+    double maxValue = totalIncome > totalExpense ? totalIncome : totalExpense;
+    double interval = (maxValue / 5).ceilToDouble();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Expense vs Income',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+          SizedBox(height: 20),
+          Text(
+            localizations.compareChart,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          SizedBox(height: 30),
+          Text(
+            localizations.showExpensesIncome,
+            style: TextStyle(
+              fontSize: 18,
+            ),
+          ),
           Container(
             height: 300,
             width: 300,
             child: BarChart(
               BarChartData(
+                gridData: FlGridData(show: true),
+                titlesData: FlTitlesData(
+                  show: true,
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 40,
+                      interval: interval,
+                      getTitlesWidget: (value, meta) {
+                        if (value >= 1000000000) {
+                          return Text(
+                            '${(value / 1000000000).toStringAsFixed(1)}B',
+                            style: TextStyle(fontSize: 12),
+                          );
+                        } else if (value >= 1000000) {
+                          return Text(
+                            '${(value / 1000000).toStringAsFixed(1)}M',
+                            style: TextStyle(fontSize: 12),
+                          );
+                        } else if (value >= 1000) {
+                          return Text(
+                            '${(value / 1000).toStringAsFixed(1)}K',
+                            style: TextStyle(fontSize: 12),
+                          );
+                        } else {
+                          return Text(
+                            value.toStringAsFixed(0),
+                            style: TextStyle(fontSize: 12),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                  rightTitles: AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (value, meta) {
+                        switch (value.toInt()) {
+                          case 0:
+                            return Text(localizations.expense);
+                          case 1:
+                            return Text(localizations.income);
+                          default:
+                            return Text('');
+                        }
+                      },
+                    ),
+                  ),
+                ),
                 borderData: FlBorderData(
                   show: true,
                   border: Border(
@@ -40,7 +100,7 @@ class CompareChart extends StatelessWidget {
                     top: BorderSide(color: Colors.transparent, width: 10),
                   ),
                 ),
-
+                minY: 0,
                 barGroups: [
                   BarChartGroupData(
                     x: 0,

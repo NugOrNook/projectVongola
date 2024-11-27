@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import '../../../database/db_manage.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddBudget extends StatefulWidget {
   final String valued;
@@ -17,7 +17,7 @@ class _AddBudgetState extends State<AddBudget> {
   final TextEditingController _amountController = TextEditingController();
 
   DateTime _startDate = DateTime.now();
-  DateTime _endDate = DateTime.now().add(Duration(days: 30)); // ค่าเริ่มต้นของ End Date
+  DateTime _endDate = DateTime.now().add(Duration(days: 30));
   String _typeTransactionName = '';
 
   @override
@@ -30,8 +30,39 @@ class _AddBudgetState extends State<AddBudget> {
     int id = int.parse(widget.valued);
     String? name = await DatabaseManagement.instance.getTypeTransactionNameById(id);
     setState(() {
-      _typeTransactionName = name ?? 'Unknown';
+     // _typeTransactionName = name ?? 'Unknown';
+      _typeTransactionName = _typeTransactionsLang(name ?? 'Unknown', AppLocalizations.of(context)!);
+
     });
+  }
+  String _typeTransactionsLang(String name,AppLocalizations localizations){
+    final localizations = AppLocalizations.of(context)!;
+    switch (name) {
+      case 'Food':
+        return localizations.food;
+      case 'Travel expenses':
+        return localizations.travelexpenses;
+      case 'Water bill':
+        return localizations.waterbill;
+      case "Electricity bill":
+        return localizations.electricitybill;
+      case 'Internet cost':
+        return localizations.internetcost;
+      case 'House cost':
+        return localizations.housecost;
+      case 'Car fare':
+        return localizations.carfare;
+      case 'Gasoline cost':
+        return localizations.gasolinecost;
+      case 'Medical expenses':
+        return localizations.medicalexpenses;
+      case 'Beauty expenses':
+        return localizations.beautyexpenses;
+      case 'Other':
+        return localizations.other;
+      default:
+        return localizations.other; //ไม่แมป
+    }
   }
 
   @override
@@ -42,149 +73,188 @@ class _AddBudgetState extends State<AddBudget> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Budget'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context); // ปิดหน้า AddTransaction และย้อนกลับไปที่หน้าเดิม
-          },
+        title:Text(localizations.budget),
+        elevation: 500.0,
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.red.shade200, Color(0xFEF7FFFF)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
         ),
+
       ),
       body: Container(
-        padding: const EdgeInsets.only(bottom: 16, left: 20, right: 20, top: 20),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 16.0),
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: const Color.fromARGB(255, 217, 217, 217),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.3),
-                spreadRadius: 2,
-                blurRadius: 5,
-              ),
-            ],
+        width: double.infinity,
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.red[100]!, Color(0xFEF7FFFF)],
+            begin: Alignment.bottomLeft,
+            end: Alignment.topRight,
           ),
-          child: FormBuilder(
-            key: _formKey,
-            child: Column(
-              children: [
-                SizedBox(height: 20),
-                Text(
-                  '$_typeTransactionName', // ใช้ชื่อ TypeTransaction
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      FormBuilderDateTimePicker(
-                        name: 'startDate',
-                        initialValue: _startDate,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2100),
-                        inputType: InputType.date,
-                        decoration: InputDecoration(
-                          labelText: 'Start Date',
-                          suffixIcon: Icon(Icons.calendar_today),
-                        ),
-                        locale: Locale('th'),
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              _startDate = value;
-                              _endDate = value.add(Duration(days: 30)); // ปรับค่า End Date ให้เป็น Start Date + 30 วัน
-                            });
-                          }
-                        },
-                      ),
-                      FormBuilderDateTimePicker(
-                        name: 'endDate',
-                        initialValue: _endDate, // ใช้ค่า End Date ที่คำนวณจาก Start Date + 30 วัน
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2100),
-                        inputType: InputType.date,
-                        decoration: InputDecoration(
-                          labelText: 'End Date',
-                          suffixIcon: Icon(Icons.calendar_today),
-                        ),
-                        locale: Locale('th'),
-                      ),
-                      FormBuilderTextField(
-                        name: 'amountController',
-                        controller: _amountController,
-                        decoration: InputDecoration(
-                          labelText: 'Enter Amount of Money',
-                          border: UnderlineInputBorder(), // เปลี่ยนเป็นเส้นใต้
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter the amount of money';
-                          }
-                          if (double.tryParse(value) == null) {
-                            return 'Please enter a valid number';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 50),
-                      SizedBox(
-                        width: double.infinity, // ให้ปุ่มยืดออกเต็มความกว้าง
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            if (_formKey.currentState!.saveAndValidate()) {
-                              var startDate = _formKey.currentState?.value['startDate'];
-                              var endDate = _formKey.currentState?.value['endDate'];
-                              var category = widget.valued;
-                              var capitalBudget = _amountController.text;
-
-                              // ปรับค่า startDate ให้เป็นเวลาเที่ยงคืน
-                              startDate = DateTime(startDate.year, startDate.month, startDate.day);
-
-                              // ข้อมูลที่ต้องการบันทึก
-                              Map<String, dynamic> row = {
-                                'date_start': startDate.toString(),
-                                'date_end': endDate.toString(),
-                                'capital_budget': double.parse(capitalBudget),
-                                'ID_type_transaction': category,
-                              };
-                              // บันทึกข้อมูลลงฐานข้อมูล
-                              await DatabaseManagement.instance.insertBudget(row);
-
-                              // กลับไปหน้าก่อนหน้าและส่งค่า
-                              Navigator.pop(context, true);
-                            }
-                          },
-                          child: Text('Submit'),
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 10), // เพิ่ม padding
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30), // มุมโค้ง
-                            ),
-                            backgroundColor: Color.fromARGB(255, 243, 240, 251), // สีพื้นหลัง
-                            elevation: 1, // เพิ่มเงา
-                            shadowColor: Colors.black.withOpacity(1.0), // สีเงา
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        child: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  spreadRadius: 4,
+                  blurRadius: 10,
                 ),
               ],
             ),
+            child: FormBuilder(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(height: 20),
+                  Center(
+                    child: Text(
+                      '$_typeTransactionName',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  _buildDateTimePicker(
+                    localizations.startdate,
+                    'startDate',
+                    _startDate,
+                        (value) {
+                      if (value != null) {
+                        setState(() {
+                          _startDate = value;
+                          _endDate = value.add(Duration(days: 30));
+                        });
+                      }
+                    },
+                  ),
+                  SizedBox(height: 10),
+                  _buildDateTimePicker(
+                    localizations.endDate,
+                    'endDate',
+                    _endDate,
+                    null,
+                  ),
+                  SizedBox(height: 20),
+                  _buildTextField(localizations.amount),
+                  SizedBox(height: 50),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.saveAndValidate()) {
+                        var startDate = _formKey.currentState?.value['startDate'];
+                        var endDate = _formKey.currentState?.value['endDate'];
+
+                        if (endDate.isBefore(startDate)) {
+                          // แสดงข้อความแจ้งเตือน
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                AppLocalizations.of(context)!.endDateBeforeStartDate, // ใช้ข้อความที่แปลแล้ว
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return; // หยุดการทำงานของปุ่ม
+                        }
+
+                        var category = widget.valued;
+                        var capitalBudget = _amountController.text;
+
+                        startDate = DateTime(startDate.year, startDate.month, startDate.day);
+
+                        Map<String, dynamic> row = {
+                          'date_start': startDate.toString(),
+                          'date_end': endDate.toString(),
+                          'capital_budget': double.parse(capitalBudget),
+                          'ID_type_transaction': category,
+                        };
+
+                        await DatabaseManagement.instance.insertBudget(row);
+                        Navigator.pop(context, true);
+                      }
+                    },
+                    child: Text(
+                      localizations.save,
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      backgroundColor: Colors.red[800],
+                      elevation: 5,
+                    ),
+                  ),
+
+
+                ],
+              ),
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDateTimePicker(String label, String name, DateTime initialValue, Function(DateTime?)? onChanged) {
+    return FormBuilderDateTimePicker(
+      name: name,
+      initialValue: initialValue,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      inputType: InputType.date,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.red[900], fontSize: 16),
+        suffixIcon: Icon(Icons.calendar_today, color: Colors.red[900]),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.red[800]!),
+        ),
+      ),
+      locale: Localizations.localeOf(context),
+      onChanged: onChanged,
+    );
+  }
+
+  Widget _buildTextField(String label) {
+    return FormBuilderTextField(
+      name: 'amountController',
+      controller: _amountController,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.red[900], fontSize: 16),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.red[900]!),
+        ),
+      ),
+      keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return label;
+        }
+        if (double.tryParse(value) == null) {
+          return AppLocalizations.of(context)!.pleaseenteravalidnumber;
+        }
+        return null;
+      },
     );
   }
 }

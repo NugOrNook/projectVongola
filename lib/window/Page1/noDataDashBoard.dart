@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import '../../database/db_manage.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NoDataDashBoard extends StatefulWidget {
   @override
@@ -13,20 +14,24 @@ class _NoDataCardDashBoardState extends State<NoDataDashBoard> {
   String year = '';
 
   @override
-  void initState() {
-    super.initState();
-    _getCurrentMonthAndYear();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _getCurrentMonthAndYear(); // เรียกฟังก์ชันเมื่อ dependencies พร้อมใช้งาน
   }
 
   void _getCurrentMonthAndYear() {
-    DateTime now = DateTime.now(); 
-    monthName = DateFormat('MMMM').format(now);
+    DateTime now = DateTime.now();
+    monthName = DateFormat('MMMM', Localizations.localeOf(context).toString()).format(now);
     year = DateFormat('yyyy').format(now);
-    setState(() {}); // เรียกใช้ setState เพื่ออัพเดต UI
+    setState(() {}); // อัปเดต UI หลังจากตั้งค่าข้อมูล
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Center(
       child: Card(
         color: Color.fromARGB(255, 9, 209, 220), // Card color
@@ -42,8 +47,7 @@ class _NoDataCardDashBoardState extends State<NoDataDashBoard> {
               children: [
                 Container(
                   padding: EdgeInsets.only(left: 20, top: 12), 
-                  child: Text(
-                    'Summary for $monthName $year',
+                  child: Text('${localizations.summaryFor} $monthName $year',
                     style: TextStyle(
                       color: Colors.white, 
                       fontSize: 16,
@@ -73,7 +77,7 @@ class _NoDataCardDashBoardState extends State<NoDataDashBoard> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'Income',
+                                        localizations.income,
                                         style: TextStyle(
                                           color: const Color.fromARGB(255, 53, 53, 53), 
                                           fontSize: 14,
@@ -108,7 +112,7 @@ class _NoDataCardDashBoardState extends State<NoDataDashBoard> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'Expense',
+                                        localizations.expense,
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontSize: 14,

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // สำหรับจัดการวันที่
-import '../../database/db_manage.dart'; 
+import '../../database/db_manage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class BudgetComparedList extends StatefulWidget {
   @override
@@ -14,31 +16,35 @@ class _BudgetComparedListState extends State<BudgetComparedList> {
   @override
   void initState() {
     super.initState();
-    _checkIfAlertShownToday(); // เรียกใช้งานฟังก์ชันตรวจสอบเมื่อเริ่มต้น
+    _checkIfAlertShownRecently(); // เรียกใช้งานฟังก์ชันตรวจสอบเมื่อเริ่มต้น
   }
 
-  // ตรวจสอบว่าการแจ้งเตือนเคยแสดงในวันนี้สำหรับแต่ละ idTypeTransaction หรือยัง
-  Future<void> _checkIfAlertShownToday() async {
+  // ตรวจสอบว่าการแจ้งเตือนเคยแสดงใน 1 ชั่วโมงที่ผ่านมา หรือยัง
+  Future<void> _checkIfAlertShownRecently() async {
     final prefs = await SharedPreferences.getInstance();
-    final todayMidnight = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-    final today = DateFormat('yyyy-MM-dd').format(todayMidnight);
+    final now = DateTime.now();
 
     for (int idTypeTransaction = 1; idTypeTransaction <= 10; idTypeTransaction++) {
-      final lastAlertDate = prefs.getString('lastAlertDate_$idTypeTransaction'); // วันที่ที่แจ้งเตือนล่าสุดของแต่ละ id
-      if (lastAlertDate == today) {
-        _alertShownMap[idTypeTransaction] = true; // แจ้งเตือนถูกแสดงแล้วในวันนี้
+      final lastAlertTime = prefs.getString('lastAlertTime_$idTypeTransaction'); // เวลาที่แจ้งเตือนล่าสุด
+      if (lastAlertTime != null) {
+        final lastAlertDateTime = DateTime.parse(lastAlertTime);
+        // ตรวจสอบว่านานกว่า 1 ชั่วโมงหรือยัง
+        if (now.difference(lastAlertDateTime).inHours >= 1) {
+          _alertShownMap[idTypeTransaction] = false; // อนุญาตให้แจ้งเตือนใหม่
+        } else {
+          _alertShownMap[idTypeTransaction] = true; // ยังไม่ครบ 1 ชั่วโมง
+        }
       } else {
-        _alertShownMap[idTypeTransaction] = false; // แจ้งเตือนยังไม่ถูกแสดง
+        _alertShownMap[idTypeTransaction] = false; // ไม่เคยแจ้งเตือน
       }
     }
   }
 
-  // บันทึกวันที่ปัจจุบันเมื่อแสดงการแจ้งเตือน
-  Future<void> _setAlertShownToday(int idTypeTransaction) async {
+  // บันทึกเวลาปัจจุบันเมื่อแสดงการแจ้งเตือน
+  Future<void> _setAlertShownRecently(int idTypeTransaction) async {
     final prefs = await SharedPreferences.getInstance();
-    final todayMidnight = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-    final today = DateFormat('yyyy-MM-dd').format(todayMidnight);
-    await prefs.setString('lastAlertDate_$idTypeTransaction', today); // บันทึกวันที่ปัจจุบันแยกตาม id
+    final now = DateTime.now();
+    await prefs.setString('lastAlertTime_$idTypeTransaction', now.toIso8601String()); // บันทึกเวลาปัจจุบัน
   }
 
   Future<List<Map<String, dynamic>>> fetchBudgetData() async {
@@ -106,65 +112,92 @@ class _BudgetComparedListState extends State<BudgetComparedList> {
       case 11:
         return 'assets/other.png';
       default:
-        return 'assets/other.png'; // กรณีที่ไม่มีการแมป
+        return 'assets/other.png';
     }
   }
 
   String getText(int idTypeTransaction) {
+    final localizations = AppLocalizations.of(context)!;
     switch (idTypeTransaction) {
       case 1:
-        return 'Food';
+        return localizations.food;
       case 2:
-        return 'Travel';
+        return localizations.travelexpenses;
       case 3:
-        return 'Water';
+        return localizations.waterbill;
       case 4:
-        return 'Electricity';
+        return localizations.electricitybill;
       case 5:
-        return 'Internet';
+        return localizations.internetcost;
       case 6:
-        return 'House';
+        return localizations.housecost;
       case 7:
-        return 'Car';
+        return localizations.carfare;
       case 8:
-        return 'Gasoline';
+        return localizations.gasolinecost;
       case 9:
-        return 'Medical';
+        return localizations.medicalexpenses;
       case 10:
-        return 'Beauty';
+        return localizations.beautyexpenses;
       case 11:
-        return 'Other';
+        return localizations.other;
       default:
-        return 'Other'; // กรณีที่ไม่มีการแมป
+        return localizations.other; //ไม่แมป
     }
   }
 
-  void _showAlertDialog(BuildContext context, String typeTransaction, double balance, int idTypeTransaction) {
+  // ฟังก์ชันแสดงการแจ้งเตือน
+  void _showAlertDialog(BuildContext context, double balance, int idTypeTransaction) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final localizations = AppLocalizations.of(context)!;
         return AlertDialog(
           title: Row(
             children: [
               Image.asset(
-                'assets/warning_1.png', // รูปโลโก้หรือรูปอื่นๆ ที่คุณต้องการ
+                'assets/warning_1.png',
                 width: 40,
                 height: 40,
               ),
               SizedBox(width: 8),
-              Text('Warning'),
+              Text(localizations.warning),
             ],
           ),
-          content: Text(
-              'The budget for $typeTransaction is over 80%. The balance is ${balance.toStringAsFixed(2)} ฿.'),
+          content: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: '${localizations.thebudgetfor} ',
+                  style: TextStyle(color: Colors.black),
+                ),
+                TextSpan(
+                  text: getText(idTypeTransaction),
+                  style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+                ),
+                TextSpan(
+                  text: localizations.isover,
+                  style: TextStyle(color: Colors.black),
+                ),
+                TextSpan(
+                  text: '${localizations.theBalanceis} ',
+                  style: TextStyle(color: Colors.red),
+                ),
+                TextSpan(
+                  text: '${balance.toStringAsFixed(2)} ฿.',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ],
+            ),
+          ),
           actions: [
             Center(
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  _setAlertShownToday(idTypeTransaction);  // บันทึกการแสดงแจ้งเตือนในวันนี้สำหรับ id นี้
+                  _setAlertShownRecently(idTypeTransaction);
                 },
-                child: Text('I Agree'),
+                child: Text(localizations.close),
               ),
             ),
           ],
@@ -173,16 +206,16 @@ class _BudgetComparedListState extends State<BudgetComparedList> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return FutureBuilder<List<Map<String, dynamic>>>(
       future: fetchBudgetData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No data available'));
+          return Center(child: Text(localizations.nodata));
         }
 
         final budgetList = snapshot.data!;
@@ -196,11 +229,11 @@ class _BudgetComparedListState extends State<BudgetComparedList> {
             final double progress = budgetData['progress'];
             final int idTypeTransaction = budgetData['idTypeTransaction'];
 
-            // แสดงการแจ้งเตือนเมื่อ progress > 0.8 และยังไม่เคยแสดงมาก่อนในวันนี้สำหรับ id นี้
+            // แสดงการแจ้งเตือนเมื่อ progress > 0.8 และยังไม่เคยแสดงมาก่อนใน 1 ชั่วโมงสำหรับ id นี้
             if (progress > 0.8 && _alertShownMap[idTypeTransaction] == false) {
               _alertShownMap[idTypeTransaction] = true; // อัปเดตว่าแสดงแจ้งเตือนแล้ว
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                _showAlertDialog(context, getText(idTypeTransaction), balance, idTypeTransaction);
+                _showAlertDialog(context, balance, idTypeTransaction);
               });
             }
 
@@ -224,7 +257,7 @@ class _BudgetComparedListState extends State<BudgetComparedList> {
                       color: Colors.grey[200],
                     ),
                     child: Image.asset(
-                      getImagePath(idTypeTransaction), // ใช้ฟังก์ชัน getImagePath เพื่อดึงรูปภาพที่ต้องการ
+                      getImagePath(idTypeTransaction),
                       width: 40,
                       height: 40,
                     ),
@@ -234,25 +267,29 @@ class _BudgetComparedListState extends State<BudgetComparedList> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        AutoSizeText(
                           getText(idTypeTransaction),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
+                          maxLines: 1,
+                          minFontSize: 12,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(height: 4),
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Budget'),
+                            Text(localizations.budget),
                             Text('${budget.toStringAsFixed(0)} ฿'),
                           ],
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Balance'),
+                            Text(localizations.balance),
                             Text('${balance.toStringAsFixed(0)} ฿'),
                           ],
                         ),

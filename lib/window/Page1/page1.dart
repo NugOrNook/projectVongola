@@ -5,6 +5,7 @@ import '../../database/db_manage.dart';
 import 'CardDashBoard.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'CardFinancial.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Page1 extends StatefulWidget {
   @override
@@ -22,9 +23,10 @@ class _Introduction extends State<Page1> {
     _refreshData();
     _intentSub = ReceiveSharingIntent.instance.getMediaStream().listen((value) {
       setState(() {
+
         List<SharedMediaFile> sharedFile = value;
         print(sharedFile[0].path);
-        Navigator.pushNamed(context, '/addTransactionPage', arguments: sharedFile[0].path);
+        Navigator.pushNamedAndRemoveUntil(context, '/addTransactionPage',ModalRoute.withName('/'), arguments: sharedFile[0].path);
       });
     }, onError: (err) {
       print("getIntentDataStream error: $err");
@@ -34,7 +36,7 @@ class _Introduction extends State<Page1> {
   void _refreshData() {
     setState(() {
       _transactionsFuture = DatabaseManagement.instance.queryAllTransactions();
-      _cardFuture = DatabaseManagement.instance.queryAllTransactions(); // อัปเดตข้อมูลสำหรับ CardDashBoard
+      _cardFuture = DatabaseManagement.instance.queryAllTransactions();
     });
   }
 
@@ -46,12 +48,25 @@ class _Introduction extends State<Page1> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(
+      elevation: 5.0,
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color.fromARGB(255, 9, 209, 220), Color(0xFEF7FFFF)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+      ),
+
+    ),
     body: ListView(
       children: <Widget>[
         Container(
           padding: EdgeInsets.fromLTRB(20, 50, 15, 0),
           child: Text(
-            'Hello, Friend!',
+            AppLocalizations.of(context)!.helloFriend,
             style: TextStyle(
               fontSize: 26,
               color: Colors.black,
@@ -62,7 +77,7 @@ class _Introduction extends State<Page1> {
         Container(
           padding: EdgeInsets.only(top: 0, bottom: 0, left: 20),
           child: Text(
-            "Let's start accounting for expenses",
+            AppLocalizations.of(context)!.startAccounting,
             style: TextStyle(
               fontSize: 14,
               color: const Color.fromARGB(255, 121, 121, 121),
@@ -72,19 +87,19 @@ class _Introduction extends State<Page1> {
         ),
         Padding(
           padding: EdgeInsets.only(top: 20, bottom: 20),
-          child: CardDashBoard(cardFuture: _cardFuture), // ส่ง Future สำหรับ CardDashBoard
+          child: CardDashBoard(cardFuture: _cardFuture),
         ),
         Container(
           padding: EdgeInsets.fromLTRB(20, 20, 15, 0),
           child: Text(
-            "Budget in each category",
+            AppLocalizations.of(context)!.showbudget,
             style: TextStyle(
               fontSize: 18,
               color: Colors.black,
             ),
           ),
         ),
-        SizedBox(height: 25,),
+        SizedBox(height: 25),
         Container(
           height: 250,
           child: CardFinancial(transactionsFuture: _transactionsFuture),
@@ -92,16 +107,18 @@ class _Introduction extends State<Page1> {
       ],
     ),
     floatingActionButton: FloatingActionButton(
+      backgroundColor: Color.fromARGB(255, 9, 209, 220),
       onPressed: () async {
         final result = await Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => AddTransaction()),
         );
         if (result == true) {
-          _refreshData(); // รีเฟรชข้อมูลใหม่ทันทีหลังจากเพิ่มข้อมูลใหม่
+          _refreshData(); // ีเฟรชข้อมูลใหม่หลังจากเพิ่มข้อมูลใหม่
         }
       },
-      child: const Icon(Icons.add, size: 25,),
+      child: const Icon(Icons.add, size: 25,color: Colors.white,),
     ),
+
   );
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import '../../../database/db_manage.dart';
 import 'package:intl/intl.dart'; // ใช้สำหรับจัดการวันที่
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class DetailBudget extends StatefulWidget {
   final String valued;
@@ -21,8 +23,8 @@ class _DetailBudget extends State<DetailBudget> {
   late Future<List<Map<String, dynamic>>> _filteredBudgets;
 
   String _typeTransactionName = '';
-  int? _idBudget; // ตัวแปรเพื่อเก็บ ID_budget
-  bool _isEditing = false; // ควบคุมสถานะการแก้ไข
+  int? _idBudget; // ัวแปรเพื่อเก็บ ID_budget
+  bool _isEditing = false; //ควบคุมสถานะการแก้ไข
 
   @override
   void initState() {
@@ -35,8 +37,39 @@ class _DetailBudget extends State<DetailBudget> {
     int id = int.parse(widget.valued);
     String? name = await DatabaseManagement.instance.getTypeTransactionNameById(id);
     setState(() {
-      _typeTransactionName = name ?? 'Unknown';
+      //_typeTransactionName = name ?? 'Unknown';
+      _typeTransactionName = _typeTransactionsLang(name ?? 'Unknown', AppLocalizations.of(context)!);
     });
+  }
+  String _typeTransactionsLang(String name,AppLocalizations localizations){
+    final localizations = AppLocalizations.of(context)!;
+    print('Received name: $name');
+    switch (name) {
+      case 'Food':
+        return localizations.food;
+      case 'Travel expenses':
+        return localizations.travelexpenses;
+      case 'Water bill':
+        return localizations.waterbill;
+      case "Electricity bill":
+        return localizations.electricitybill;
+      case 'Internet cost':
+        return localizations.internetcost;
+      case 'House cost':
+        return localizations.housecost;
+      case 'Car fare':
+        return localizations.carfare;
+      case 'Gasoline cost':
+        return localizations.gasolinecost;
+      case 'Medical expenses':
+        return localizations.medicalexpenses;
+      case 'Beauty expenses':
+        return localizations.beautyexpenses;
+      case 'Other':
+        return localizations.other;
+      default:
+        return localizations.other; //ไม่แมป
+    }
   }
 
   Future<List<Map<String, dynamic>>> _loadFilteredBudgets() async {
@@ -60,82 +93,103 @@ class _DetailBudget extends State<DetailBudget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Budget' : 'Budget Detail'),
-          centerTitle: true, // จัด title ให้อยู่ตรงกลาง
+    final localizations = AppLocalizations.of(context)!;
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.red.shade200, Color(0xFEF7FFFF)],
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: Text(_isEditing ? localizations.editBudget : localizations.budgetDetail),
+          centerTitle: true,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.red.shade200, Color(0xFEF7FFFF)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+          ),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
               if (_isEditing) {
                 setState(() {
-                  _isEditing = false; // กลับไปหน้า Budget Detail
+                  _isEditing = false;
                 });
               } else {
-                Navigator.pop(context); // ถ้าไม่ได้อยู่ในโหมดแก้ไข ก็ย้อนกลับไปหน้าก่อนหน้า
+                Navigator.pop(context);
               }
             },
           ),
-        elevation: 1.0, // เพิ่มเงาใต้ AppBar
-        bottom: PreferredSize( // เพิ่มเส้นแบ่งที่ด้านล่างของ AppBar
-          preferredSize: Size.fromHeight(1.0),
-          child: Container(
-            color: const Color.fromARGB(255, 217, 217, 217), // สีเส้นแบ่ง
-            height: 1.0,
+          elevation: 1.0,
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(1.0),
+            child: Container(
+              color: const Color.fromARGB(255, 217, 217, 217),
+              height: 1.0,
+            ),
           ),
         ),
-      ),
-
-      body: Padding(
-        padding: const EdgeInsets.only(bottom: 16, left: 20, right: 20, top: 20),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 16.0),
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: const Color.fromARGB(255, 217, 217, 217),
-              width: 1,
+        body: Padding(
+          padding: const EdgeInsets.only(bottom: 16, left: 20, right: 20, top: 20),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 16.0),
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color.fromARGB(255, 217, 217, 217),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                ),
+              ],
             ),
-            boxShadow: [
-                  BoxShadow(
-                color: Colors.grey.withOpacity(0.3),
-                spreadRadius: 2,
-                blurRadius: 5,
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _typeTransactionName,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            child: Column(
+              children: [
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _typeTransactionName,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-
-              // กำหนดขนาดให้ ListView เพื่อไม่ให้ขยับ
-              SizedBox(
-                height: 293, // ระบุขนาดคงที่ให้กับ ListView
-                child: _isEditing ? _buildEditForm(_idBudget!) : _buildBudgetList(),
-              ),
-            ],
+                  ],
+                ),
+                SizedBox(height: 10),
+                SizedBox(
+                  height: 293,
+                  child: _isEditing ? _buildEditForm(_idBudget!) : _buildBudgetList(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-  
+
+// Remaining widgets (_buildBudgetList, _buildEditForm) remain the same
+
+
   // แสดงข้อมูลรายการ budget
   Widget _buildBudgetList() {
+    final localizations = AppLocalizations.of(context)!;
     return FutureBuilder<List<Map<String, dynamic>>>(
       future: _filteredBudgets,
       builder: (context, snapshot) {
@@ -144,7 +198,7 @@ class _DetailBudget extends State<DetailBudget> {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No budgets found.'));
+          return Center(child: Text(localizations.noBudgetFound));
         } else {
           final budgets = snapshot.data!;
           return ListView.builder(
@@ -164,21 +218,21 @@ class _DetailBudget extends State<DetailBudget> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Capital', style: TextStyle(fontSize: 16)),
+                        Text(localizations.budget, style: TextStyle(fontSize: 16)),
                         Text('${budget['capital_budget']} ฿', style: TextStyle(fontSize: 16)),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Start date', style: TextStyle(fontSize: 16)),
+                        Text(localizations.startdate, style: TextStyle(fontSize: 16)),
                         Text('$formattedStartDate', style: TextStyle(fontSize: 16)),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('End date', style: TextStyle(fontSize: 16)),
+                        Text(localizations.endDate, style: TextStyle(fontSize: 16)),
                         Text('$formattedEndDate', style: TextStyle(fontSize: 16)),
                       ],
                     ),
@@ -197,13 +251,15 @@ class _DetailBudget extends State<DetailBudget> {
                                 _isEditing = !_isEditing;
                               });
                             },
-                            child: Text('Edit'),
+                            child: Text(localizations.edit,
+                              style: TextStyle(color: Colors.red),),
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.symmetric(vertical: 10), // Same padding as Save button
                               shape: RoundedRectangleBorder(
+                                side: BorderSide(color: Colors.red, width: 2),
                                 borderRadius: BorderRadius.circular(30), // Match Save button's rounded corners
                               ),
-                              backgroundColor: Color.fromARGB(255, 243, 240, 251), // Same background color as Save button
+                              backgroundColor: Color(0xFEF7FFFF), // Same background color as Save button
                               elevation: 1, // Increase elevation to match the Save button's shadow
                               shadowColor: Colors.black.withOpacity(1.0), // Subtle shadow for the bottom
                             ),
@@ -224,7 +280,7 @@ class _DetailBudget extends State<DetailBudget> {
   // ฟอร์มแก้ไขข้อมูล budget
   Widget _buildEditForm(int _idBudget) {
     final int idBudget = _idBudget;
-
+    final localizations = AppLocalizations.of(context)!;
     return Container(
       padding: EdgeInsets.all(10),
       child: FormBuilder(
@@ -234,14 +290,14 @@ class _DetailBudget extends State<DetailBudget> {
             FormBuilderTextField(
               name: 'amountController',
               controller: _amountController,
-              decoration: InputDecoration(labelText: 'Capital Budget'),
+              decoration: InputDecoration(labelText: localizations.budget),
               keyboardType: TextInputType.number,
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter the amount of money';
+                  return localizations.pleaseentertheamountofmoney;
                 }
                 if (double.tryParse(value) == null) {
-                  return 'Please enter a valid number';
+                  return localizations.pleaseenteravalidnumber;
                 }
                 return null;
               },
@@ -249,7 +305,7 @@ class _DetailBudget extends State<DetailBudget> {
             FormBuilderDateTimePicker(
               name: 'startDate',
               initialValue: DateFormat('yyyy-MM-dd').parse(_startDateController.text), // ใช้ค่า initialValue แทน controller
-              decoration: InputDecoration(labelText: 'Start Date'),
+              decoration: InputDecoration(labelText: localizations.startdate),
               firstDate: DateTime(2000),
               lastDate: DateTime(2100),
               inputType: InputType.date,
@@ -258,12 +314,12 @@ class _DetailBudget extends State<DetailBudget> {
             FormBuilderDateTimePicker(
               name: 'endDate',
               initialValue: DateFormat('yyyy-MM-dd').parse(_endDateController.text), // ใช้ค่า initialValue แทน controller
-              decoration: InputDecoration(labelText: 'End Date'),
+              decoration: InputDecoration(labelText: localizations.endDate),
               firstDate: DateTime(2000),
               lastDate: DateTime(2100),
               inputType: InputType.date,
               locale: Locale('th'),
-            ),  
+            ),
             SizedBox(height: 50),
 
             Row(
@@ -275,6 +331,19 @@ class _DetailBudget extends State<DetailBudget> {
                         var startDate = _formKey.currentState?.value['startDate'];
                         var endDate = _formKey.currentState?.value['endDate'];
                         var capitalBudget = _amountController.text;
+                        if (endDate.isBefore(startDate)) {
+                          // แสดงข้อความแจ้งเตือน
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                AppLocalizations.of(context)!.endDateBeforeStartDate, // ใช้ข้อความที่แปลแล้ว
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return; // หยุดการทำงานของปุ่ม
+                        }
 
                         // ตั้งค่าเวลาให้เป็นเที่ยงคืน
                         DateTime startDateTime = DateTime(startDate.year, startDate.month, startDate.day, 0, 0, 0);
@@ -292,16 +361,19 @@ class _DetailBudget extends State<DetailBudget> {
 
                         // กลับไปหน้าก่อนหน้า
                         Navigator.pop(context, true); // ส่งค่ากลับว่าเสร็จเรียบร้อย
-                        // กลับไปหน้าก่อนหน้า
-                        // Navigator.pushReplacement(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => DetailBudget(valued: widget.valued),
-                        //   ),
-                        // );
                       }
                     },
-                    child: Text('Save'),
+                    child: Text(localizations.save,style: TextStyle(color: Colors.red),),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 10), // Same padding as Save button
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Colors.red, width: 2),
+                        borderRadius: BorderRadius.circular(30), // Match Save button's rounded corners
+                      ),
+                      backgroundColor: Color(0xFEF7FFFF), // Same background color as Save button
+                      elevation: 1, // Increase elevation to match the Save button's shadow
+                      shadowColor: Colors.black.withOpacity(1.0), // Subtle shadow for the bottom
+                    ),
                   ),
                 ),
               ],

@@ -13,8 +13,23 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- Required to query activities that can process text -->
+
+
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <application>
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+    </application>
+
+
 
     <queries>
         <intent>
@@ -51,7 +66,9 @@
             android:launchMode="singleTask"
             android:taskAffinity=""
             android:theme="@style/LaunchTheme"
-            android:windowSoftInputMode="adjustResize" >
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait">
+
 
             <!--
                  Specifies an Android theme to apply to this Activity as soon as
@@ -78,13 +95,7 @@
 
                 <data android:mimeType="image/*" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND_MULTIPLE" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="image/*" />
-            </intent-filter>
         </activity>
 
         <!--
@@ -116,74 +127,74 @@
                 android:name="photopicker_activity:0:required"
                 android:value="" />
         </service>
-        <service
-            android:name="com.google.mlkit.common.internal.MlKitComponentDiscoveryService"
-            android:directBootAware="true"
-            android:exported="false" >
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.nl.entityextraction.internal.EntityExtractionComponentRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.nl.smartreply.bundled.internal.ThickSmartReplyRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.nl.translate.NaturalLanguageTranslateRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.vision.facemesh.internal.FaceMeshRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.vision.label.defaults.internal.BundledLabelRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.vision.label.custom.internal.CustomLabelRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.vision.objects.defaults.internal.DefaultObjectsRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.vision.objects.custom.internal.CustomObjectsRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.vision.segmentation.internal.SegmentationRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.vision.barcode.internal.BarcodeRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.vision.face.internal.FaceRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.vision.pose.internal.PoseRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.vision.vkp.VkpRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.vision.text.internal.TextRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.vision.common.internal.VisionCommonRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.vision.digitalink.internal.DigitalInkRecognitionRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.linkfirebase.internal.LinkFirebaseComponentRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.nl.languageid.bundled.internal.ThickLanguageIdRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.nl.smartreply.internal.SmartReplyRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.nl.languageid.internal.LanguageIdRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.mlkit.common.internal.CommonComponentRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-        </service>
+<!--        <service-->
+<!--            android:name="com.google.mlkit.common.internal.MlKitComponentDiscoveryService"-->
+<!--            android:directBootAware="true"-->
+<!--            android:exported="false" >-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.nl.entityextraction.internal.EntityExtractionComponentRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.nl.smartreply.bundled.internal.ThickSmartReplyRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.nl.translate.NaturalLanguageTranslateRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.vision.facemesh.internal.FaceMeshRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.vision.label.defaults.internal.BundledLabelRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.vision.label.custom.internal.CustomLabelRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.vision.objects.defaults.internal.DefaultObjectsRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.vision.objects.custom.internal.CustomObjectsRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.vision.segmentation.internal.SegmentationRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.vision.barcode.internal.BarcodeRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.vision.face.internal.FaceRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.vision.pose.internal.PoseRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.vision.vkp.VkpRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.vision.text.internal.TextRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.vision.common.internal.VisionCommonRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.vision.digitalink.internal.DigitalInkRecognitionRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.linkfirebase.internal.LinkFirebaseComponentRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.nl.languageid.bundled.internal.ThickLanguageIdRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.nl.smartreply.internal.SmartReplyRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.nl.languageid.internal.LanguageIdRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--            <meta-data-->
+<!--                android:name="com.google.firebase.components:com.google.mlkit.common.internal.CommonComponentRegistrar"-->
+<!--                android:value="com.google.firebase.components.ComponentRegistrar" />-->
+<!--        </service>-->
         <!--
              Required for ML Kit Pose Detection GPU acceleration. Applications that target Android
              S+ require explicit declaration of any referenced vendor-provided libraries.
@@ -198,11 +209,11 @@
             android:name="libOpenCL-pixel.so"
             android:required="false" />
 
-        <provider
-            android:name="com.google.mlkit.common.internal.MlKitInitProvider"
-            android:authorities="com.example.vongola.mlkitinitprovider"
-            android:exported="false"
-            android:initOrder="99" />
+<!--        <provider-->
+<!--            android:name="com.google.mlkit.common.internal.MlKitInitProvider"-->
+<!--            android:authorities="com.example.vongola.mlkitinitprovider"-->
+<!--            android:exported="false"-->
+<!--            android:initOrder="99" />-->
 
         <service
             android:name="com.google.firebase.components.ComponentDiscoveryService"
@@ -225,10 +236,10 @@
             </intent-filter>
         </receiver>
 
-        <service
-            android:name="com.google.mlkit.acceleration.internal.MlKitRemoteWorkerService"
-            android:exported="false"
-            android:process=":mlkit_acceleration_mini_benchmark" />
+<!--        <service-->
+<!--            android:name="com.google.mlkit.acceleration.internal.MlKitRemoteWorkerService"-->
+<!--            android:exported="false"-->
+<!--            android:process=":mlkit_acceleration_mini_benchmark" />-->
 
         <activity
             android:name="com.google.android.gms.common.api.GoogleApiActivity"
@@ -256,23 +267,23 @@
             android:name="androidx.work.multiprocess.RemoteWorkManagerService"
             android:exported="false" />
 
-        <provider
-            android:name="androidx.startup.InitializationProvider"
-            android:authorities="com.example.vongola.androidx-startup"
-            android:exported="false" >
-            <meta-data
-                android:name="androidx.work.WorkManagerInitializer"
-                android:value="androidx.startup" />
-            <meta-data
-                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-                android:value="androidx.startup" />
-            <meta-data
-                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-                android:value="androidx.startup" />
-            <meta-data
-                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-                android:value="androidx.startup" />
-        </provider>
+<!--        <provider-->
+<!--            android:name="androidx.startup.InitializationProvider"-->
+<!--            android:authorities="com.example.vongola.androidx-startup"-->
+<!--            android:exported="false" >-->
+<!--            <meta-data-->
+<!--                android:name="androidx.work.WorkManagerInitializer"-->
+<!--                android:value="androidx.startup" />-->
+<!--            <meta-data-->
+<!--                android:name="androidx.emoji2.text.EmojiCompatInitializer"-->
+<!--                android:value="androidx.startup" />-->
+<!--            <meta-data-->
+<!--                android:name="androidx.lifecycle.ProcessLifecycleInitializer"-->
+<!--                android:value="androidx.startup" />-->
+<!--            <meta-data-->
+<!--                android:name="androidx.profileinstaller.ProfileInstallerInitializer"-->
+<!--                android:value="androidx.startup" />-->
+<!--        </provider>-->
 
         <service
             android:name="androidx.work.impl.background.systemalarm.SystemAlarmService"

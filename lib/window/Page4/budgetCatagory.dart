@@ -1,8 +1,9 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'pageAddBudget.dart';
 import 'detailBudget.dart'; // เพิ่ม import สำหรับ detailBudget page
 import '../../database/db_manage.dart'; // เพิ่ม import สำหรับ DatabaseManagement
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class Budgetcatagory extends StatefulWidget {
   @override
   _Budgetcatagory createState() => _Budgetcatagory();
@@ -13,37 +14,59 @@ class _Budgetcatagory extends State<Budgetcatagory> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add budget category'),
+        title: Text(localizations.addBudgetCategory),
+        centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.red.shade200, Color(0xFEF7FFFF)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+        ),
       ),
-      body: Column(
-        children: [
+      body: Container(
+        width: double.infinity,
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.red[100]!, Color(0xFEF7FFFF)],
+            begin: Alignment.bottomLeft,
+            end: Alignment.topRight,
+          ),
+        ),
+        child: Column(
+            children: [
           Expanded(
             child: ListView(
               padding: const EdgeInsets.only(bottom: 16, left: 20, right: 20, top: 20),
               children: [
-                _buildBudgetItem('assets/food.png', "Food", '1'),
-                _buildBudgetItem('assets/travel_expenses.png', "Travel expenses", '2'),
-                _buildBudgetItem('assets/water_bill.png', "Water bill", '3'),
-                _buildBudgetItem('assets/electricity_bill.png', "Electricity bill", '4'),
-                _buildBudgetItem('assets/internet.png', "Internet cost", '5'),
-                _buildBudgetItem('assets/house.png', "House cost", '6'),
-                _buildBudgetItem('assets/car.png', "Car fare", '7'),
-                _buildBudgetItem('assets/gasoline_cost.png', "Gasoline cost", '8'),
-                _buildBudgetItem('assets/medical.png', "Medical", '9'),
-                _buildBudgetItem('assets/beauty.png', "Beauty", '10'),
-                _buildBudgetItem('assets/other.png', "Other", '11'),
+                _buildBudgetItem('assets/food.png', localizations.food, '1'),
+                _buildBudgetItem('assets/travel_expenses.png', localizations.travelexpenses, '2'),
+                _buildBudgetItem('assets/water_bill.png', localizations.waterbill, '3'),
+                _buildBudgetItem('assets/electricity_bill.png', localizations.electricitybill, '4'),
+                _buildBudgetItem('assets/internet.png', localizations.internetcost, '5'),
+                _buildBudgetItem('assets/house.png',localizations.housecost, '6'),
+                _buildBudgetItem('assets/car.png', localizations.carfare, '7'),
+                _buildBudgetItem('assets/gasoline_cost.png', localizations.gasolinecost, '8'),
+                _buildBudgetItem('assets/medical.png', localizations.medicalexpenses, '9'),
+                _buildBudgetItem('assets/beauty.png', localizations.beautyexpenses, '10'),
+                _buildBudgetItem('assets/other.png', localizations.other, '11'),
               ],
             ),
           ),
         ],
+      ),
       ),
     );
   }
@@ -70,21 +93,22 @@ class _Budgetcatagory extends State<Budgetcatagory> {
               builder: (context) => AddBudget(valued: valued),
             ),
           );
-          
+
           if (result == true) {
             Navigator.pop(context, true); // ส่งค่า true กลับไปยัง page4.dart
           }
         }
       },
-      
+
       child: Container(
+
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: const Color.fromARGB(255, 217, 217, 217), 
+            color: const Color.fromARGB(255, 217, 217, 217),
             width: 1,
           ),
         ),
@@ -107,12 +131,15 @@ class _Budgetcatagory extends State<Budgetcatagory> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  AutoSizeText(
                     label,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+
                     ),
+                    maxLines: 1,
+                    minFontSize: 12,
                   ),
                 ],
               ),
@@ -156,5 +183,4 @@ class _Budgetcatagory extends State<Budgetcatagory> {
   }
 
 }
-
 

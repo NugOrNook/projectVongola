@@ -1,29 +1,23 @@
 import 'dart:async';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-
-// สร้าง class จัดการข้อมูล
 class DatabaseManagement {
-  
-  static final DatabaseManagement instance = DatabaseManagement._init();  
-  static Database? _database;   
+  static final DatabaseManagement instance = DatabaseManagement._init();
+  static Database? _database;
   final String tableTransaction = "Transactions";
   final String tableBudget = "Budget";
-  final String tableTypeTransaction = "Type_transaction";                                          
-    
+  final String tableTypeTransaction = "Type_transaction";
   DatabaseManagement._init();
 
   Future<Database> get database async {
-    if (_database != null) return _database!;                             
-    _database = await _initDB('transaction.db');                          
-    return _database!;                                                    
+    if (_database != null) return _database!;
+    _database = await _initDB('transaction.db');
+    return _database!;
   }
-
   Future<Database> _initDB(String filePath) async {
-    final dbPath = await getDatabasesPath();                          
-    final path = join(dbPath, filePath);      
-    //await deleteDatabase(path); // ลบฐานข้อมูลหากมีอยู่แล้ว                        
-    return await openDatabase(path, version: 1, onCreate: _createDB); 
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, filePath);
+    return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
   Future _createDB(Database db, int version) async {
@@ -33,15 +27,12 @@ class DatabaseManagement {
     final columnTypeExpense = 'type_expense';
     final columnMemoTransaction = 'memo_transaction';
     final columnReferralCode = 'referral_code';
-
     final columnIdTypeTransaction = 'ID_type_transaction';
     final columnTypeTransaction = 'type_transaction';
-  
     final columnIdBudget = 'ID_budget';
     final columnCapitalBudget = 'capital_budget';
     final columnDateStart = 'date_start';
     final columnDateEnd = 'date_end';
-    
     await db.execute('''CREATE TABLE $tableTransaction (
       $columnIdTransaction INTEGER PRIMARY KEY AUTOINCREMENT, 
       $columnDateUser TEXT NOT NULL,
@@ -52,7 +43,6 @@ class DatabaseManagement {
       $columnReferralCode TEXT,  
       FOREIGN KEY ($columnIdTypeTransaction) REFERENCES $tableTypeTransaction ($columnIdTypeTransaction)
     )''');
-
     await db.execute('''CREATE TABLE $tableBudget (
       $columnIdBudget INTEGER PRIMARY KEY AUTOINCREMENT,
       $columnCapitalBudget REAL NOT NULL,
@@ -61,7 +51,6 @@ class DatabaseManagement {
       $columnDateEnd TEXT NOT NULL,
       FOREIGN KEY ($columnIdTypeTransaction) REFERENCES $tableTypeTransaction ($columnIdTypeTransaction)
     )''');
-
     await db.execute('''CREATE TABLE $tableTypeTransaction (
       $columnIdTypeTransaction INTEGER PRIMARY KEY AUTOINCREMENT,
       $columnTypeTransaction TEXT NOT NULL
@@ -79,6 +68,7 @@ class DatabaseManagement {
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Beauty expenses' });
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'Other' });
     await db.insert(tableTypeTransaction, { columnTypeTransaction: 'IC' });
+
 
 
     //----------------------------------{ Mock data }------------------------------------
@@ -102,9 +92,9 @@ class DatabaseManagement {
     //   columnDateStart: '2024-03-01T00:00:00',
     //   columnDateEnd: '2024-10-31T23:59:59',
     // });
-   //-----------------------------------------------------------------------------------
-  } 
- 
+    //-----------------------------------------------------------------------------------
+  }
+
   Future<int> insertTransaction(Map<String, dynamic> row) async {
     Database db = await instance.database;
     return await db.insert(tableTransaction, row);
@@ -172,7 +162,7 @@ class DatabaseManagement {
   //   final db = await instance.database;
   //   return await db.delete('transactions');
   // }
-  
+
   // Future<int> deleteAllBudgets() async {
   //   final db = await instance.database;
   //   return await db.delete('Budget');
@@ -183,7 +173,7 @@ class DatabaseManagement {
   //   db.close();
   // }
   // ------------------------------------------------------
-  
+
   Future<void> showAllData() async {
     Database db = await instance.database;
 
@@ -191,12 +181,12 @@ class DatabaseManagement {
     List<Map<String, dynamic>> transactions = await db.query(tableTransaction);
     print('Transactions:');
     printTable(transactions);
-    
+
     // ดึงข้อมูลจากตาราง budget
     List<Map<String, dynamic>> budgets = await db.query(tableBudget);
     print('Budgets:');
     printTable(budgets);
-    
+
     // ดึงข้อมูลจากตาราง type_transaction
     List<Map<String, dynamic>> typeTransactions = await db.query(tableTypeTransaction);
     print('Type Transactions:');
@@ -230,7 +220,7 @@ class DatabaseManagement {
     }
     return typeMap;
   }
-  
+
   //ดึง ID_type_transaction จาก type_transaction
   Future<int?> getTypeTransactionId(String category) async {
     Database db = await DatabaseManagement.instance.database;
@@ -280,7 +270,7 @@ class DatabaseManagement {
       return null; // ถ้าไม่พบข้อมูล
     }
   }
-  
+
   Future<List<Map<String, dynamic>>> rawQuery(String query, [List<Object>? arguments]) async {
     final db = await instance.database;
     return await db.rawQuery(query, arguments);
@@ -301,4 +291,5 @@ class DatabaseManagement {
 
     return Sqflite.firstIntValue(result)! > 0;
   }
+
 }
